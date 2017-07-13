@@ -3,6 +3,9 @@ package net.bitnine.domain;
 import java.math.BigDecimal;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties({ "rProps", "pProps" })
 public class Edge  {
 
 	private BigDecimal rId;
@@ -27,6 +30,17 @@ public class Edge  {
 		this.pName = pName;
 		this.pProps = pProps;
 		this.dataMetaList = dataMetaList;
+	}
+
+	public Edge(BigDecimal rId, BigDecimal rHead, BigDecimal rTail, String rProps, BigDecimal pId, String pName,
+			String pProps) {
+		this.rId = rId;
+		this.rHead = rHead;
+		this.rTail = rTail;
+		this.rProps = rProps;
+		this.pId = pId;
+		this.pName = pName;
+		this.pProps = pProps;
 	}
 
 	public BigDecimal getrId() {
