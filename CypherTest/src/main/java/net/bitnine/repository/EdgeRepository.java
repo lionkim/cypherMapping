@@ -13,6 +13,10 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -25,9 +29,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import net.bitnine.domain.DataMeta;
 import net.bitnine.domain.Edge;
+import net.bitnine.domain.Vertex;
 import net.bitnine.utils.MetaDataUtils;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
 
 @Repository
 public class EdgeRepository {
@@ -85,10 +88,14 @@ public class EdgeRepository {
 		    	int colCnt = resultSetMetaData.getColumnCount();
 				while (resultSet.next()) {
 					// ResultSet의 결과를 LinkedHashMap에 저장 - put 순서대로 꺼내기 위해
-					JSONObject rowJsonObject = new JSONObject();
-					for (int i = 1; i <= colCnt; i++) { // i가 1부터 시작함에 유의
-						String columnName = resultSetMetaData.getColumnLabel(i).toUpperCase();
-						rowJsonObject.put(columnName, resultSet.getString(columnName));
+					JSONObject rowJsonObject = null;
+					
+					for (int i = 1; i <= colCnt; i++) { // i가 1부터 시작함에 유의		
+						try {
+							rowJsonObject = changeType(resultSet, resultSetMetaData,  i);
+						} catch (ParseException e) {
+							e.printStackTrace();
+						}
 					}
 					nodeJsonArr.add(rowJsonObject);
 				}
@@ -98,6 +105,54 @@ public class EdgeRepository {
 				return mapRet;
 			}
 		});
+	}
+	
+	private JSONObject changeType(ResultSet resultSet, ResultSetMetaData resultSetMetaData, int cnt) throws ParseException, SQLException {
+		JSONParser parser = new JSONParser();
+		String columnTypeName = resultSetMetaData.getColumnTypeName(cnt);
+
+		String columnName = resultSetMetaData.getColumnLabel(cnt).toUpperCase();
+		String result = resultSet.getString(columnName);
+		
+		
+		JSONObject rowJsonObject = new JSONObject();
+		
+		switch (columnTypeName) {
+
+		// number에는 int, long, double, float 등
+		case "number": 
+			long longResult = Long.parseLong(result);
+			rowJsonObject.put(columnName, new Long(longResult) );
+
+		case "varchar": 
+			rowJsonObject.put(columnName, result );
+			
+		case "graphid": 
+			Double doubleResult = resultSet.getDouble(columnName);
+			
+			rowJsonObject.put(columnName, doubleResult );
+			
+		case "text": 
+			rowJsonObject.put(columnName, result );
+		
+		case "jsonb": 
+			rowJsonObject.put(columnName, (JSONObject) parser.parse(result) );
+			
+		/*case "VERTEX": 
+			return  new Vertex(result);
+
+		case "EDGE": 
+			return  new Long(result);
+
+		case "PATH": 
+			return  new Long(result);*/
+
+		default : 
+			//return result;
+
+		}
+
+		return rowJsonObject;
 	}
 	
 
