@@ -6,8 +6,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.codehaus.jackson.JsonGenerationException;
-import org.codehaus.jackson.map.JsonMappingException;
+
 import org.junit.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;

@@ -9,6 +9,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -21,8 +22,6 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import net.bitnine.domain.Path;
 import net.bitnine.domain.dto.DataSourceDTO;
 import net.bitnine.service.PathService;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
 
 @RestController
 public class PathController {

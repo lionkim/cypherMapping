@@ -5,6 +5,8 @@ import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -13,8 +15,6 @@ import net.bitnine.domain.Jsonb;
 import net.bitnine.domain.dto.DataSourceDTO;
 import net.bitnine.repository.JsonbRepository;
 import net.bitnine.service.DatabaseService;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
 
 @RestController
 public class JsonbController {

@@ -21,26 +21,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import net.bitnine.domain.Edge;
 import net.bitnine.domain.dto.DataSourceDTO;
-import net.bitnine.repository.EdgeRepository;
+import net.bitnine.repository.JsonObjectRepository;
 
 @Service
-public class EdgeService {
-	EdgeRepository edgeRepository;
+public class JsonObjectService {
+	JsonObjectRepository edgeRepository;
 
-	@Autowired private DatabaseService databaseService;
-
-	/*public List<Edge> findEdge (DataSourceDTO dataSourceDTO) {
-		DataSource dataSource = databaseService.createDataSource(dataSourceDTO);
-		
-		edgeRepository = new EdgeRepository(dataSource);
-		
-		List<Edge> edgeList = edgeRepository.findEdge();
-		
-		return edgeList;
-	}*/
 	
-
-	/*public List<Edge> findEdge (String query, HttpServletRequest request) {
+	public Map<String, Object> getJson (String query, HttpServletRequest request) {
 		HttpSession session = request.getSession();
 		if (session.getAttribute(DATASOURCE) == null) {
 			return null;
@@ -48,24 +36,9 @@ public class EdgeService {
 		DataSource dataSource = (DataSource) session.getAttribute(DATASOURCE);
 		System.out.println("dataSource: " + dataSource);
 		
-		edgeRepository = new EdgeRepository(dataSource);
+		edgeRepository = new JsonObjectRepository(dataSource);
 		
-		List<Edge> edgeList = edgeRepository.findEdge(query);
-		
-		return edgeList;
-	}*/
-	
-	public Map<String, Object> findEdge (String query, HttpServletRequest request) {
-		HttpSession session = request.getSession();
-		if (session.getAttribute(DATASOURCE) == null) {
-			return null;
-		}
-		DataSource dataSource = (DataSource) session.getAttribute(DATASOURCE);
-		System.out.println("dataSource: " + dataSource);
-		
-		edgeRepository = new EdgeRepository(dataSource);
-		
-		Map<String, Object> edgeList = edgeRepository.findEdge(query);
+		Map<String, Object> edgeList = edgeRepository.getJson(query);
 		
 		return edgeList;
 	}

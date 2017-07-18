@@ -29,49 +29,19 @@ import org.springframework.transaction.annotation.Transactional;
 
 import net.bitnine.domain.DataMeta;
 import net.bitnine.domain.Edge;
-import net.bitnine.domain.Vertex;
 import net.bitnine.utils.MetaDataUtils;
 
 @Repository
-public class EdgeRepository {
+public class JsonObjectRepository {
 	
 	private JdbcTemplate jdbcTemplate;
 
-	public EdgeRepository(DataSource dataSource) {
+	public JsonObjectRepository(DataSource dataSource) {
 		jdbcTemplate = new JdbcTemplate(dataSource);
 	}
-
-//	String query = "match ()-[a:keyword_of]-() retur n a limit 20";
-	/*String query = "match (n:production)-[r:actress_in]-(p:person)"
-			+ " where id(n) = '4.1388625'"
-			+ " return id(r) as r_id, start(r) as r_head, \"end\"(r) as r_tail, properties(r) as r_props"
-			+ " , id(p) as p_id, p.name as p_name, properties(p) as p_props";*/
 	
-    /*@Transactional(readOnly=true)
-    public List<Edge> findEdge() {
-        return jdbcTemplate.query(query, new EdgeRowMapper());
-    }*/
-    
-    /*public List<Map<String, Object>> findEdge(String query) {
-        return jdbcTemplate.queryForList(query);
-    }*/
-	/*public List<Map<String, Object>> findEdge(String query) {
-		SqlRowSet rowSet = jdbcTemplate.queryForRowSet(query);
-
-		int columnCount = rowSet.getMetaData().getColumnCount();
-		System.out.println(columnCount);
-
-		while (rowSet.next()) {
-
-			for (int id = 1; id <= columnCount; id++) {
-				System.out.println(rowSet.getString(id));
-			}
-
-		}
-		return null;
-	}*/
 	
-	public JSONObject findEdge(String query) {
+	public JSONObject getJson(String query) {
 		return jdbcTemplate.query(query, new ResultSetExtractor<JSONObject>() {
 			@Override
 			public JSONObject extractData(ResultSet resultSet) throws SQLException, DataAccessException {
@@ -88,11 +58,11 @@ public class EdgeRepository {
 		    	int colCnt = resultSetMetaData.getColumnCount();
 				while (resultSet.next()) {
 					// ResultSet의 결과를 LinkedHashMap에 저장 - put 순서대로 꺼내기 위해
-					JSONObject rowJsonObject = null;
+					JSONObject rowJsonObject = new JSONObject();
 					
-					for (int i = 1; i <= colCnt; i++) { // i가 1부터 시작함에 유의		
+					for (int count = 1; count <= colCnt; count++) { // i가 1부터 시작함에 유의		
 						try {
-							rowJsonObject = changeType(resultSet, resultSetMetaData,  i);
+							setChangeType(resultSet, resultSetMetaData, rowJsonObject, count);		// 컬럼의 타입별로 해당타입으로 변환하여 jsonObject에 put.
 						} catch (ParseException e) {
 							e.printStackTrace();
 						}
@@ -107,36 +77,38 @@ public class EdgeRepository {
 		});
 	}
 	
-	private JSONObject changeType(ResultSet resultSet, ResultSetMetaData resultSetMetaData, int cnt) throws ParseException, SQLException {
+	private void setChangeType(ResultSet resultSet, ResultSetMetaData resultSetMetaData, JSONObject rowJsonObject, int cnt) throws ParseException, SQLException {
 		JSONParser parser = new JSONParser();
 		String columnTypeName = resultSetMetaData.getColumnTypeName(cnt);
 
 		String columnName = resultSetMetaData.getColumnLabel(cnt).toUpperCase();
-		String result = resultSet.getString(columnName);
-		
-		
-		JSONObject rowJsonObject = new JSONObject();
-		
+		String result = resultSet.getString(columnName);	
+				
 		switch (columnTypeName) {
 
 		// number에는 int, long, double, float 등
 		case "number": 
 			long longResult = Long.parseLong(result);
-			rowJsonObject.put(columnName, new Long(longResult) );
+			rowJsonObject.put(columnName, longResult );
+			break;
 
-		case "varchar": 
+		case "varchar":
 			rowJsonObject.put(columnName, result );
+			break;
 			
 		case "graphid": 
 			Double doubleResult = resultSet.getDouble(columnName);
-			
+				
 			rowJsonObject.put(columnName, doubleResult );
+			break;
 			
 		case "text": 
 			rowJsonObject.put(columnName, result );
+			break;
 		
 		case "jsonb": 
-			rowJsonObject.put(columnName, (JSONObject) parser.parse(result) );
+			rowJsonObject.put(columnName,  (JSONObject) parser.parse(result)  );
+			break;
 			
 		/*case "VERTEX": 
 			return  new Vertex(result);
@@ -148,13 +120,22 @@ public class EdgeRepository {
 			return  new Long(result);*/
 
 		default : 
+			rowJsonObject.put(columnName, result );
+			break;
 			//return result;
 
 		}
-
-		return rowJsonObject;
 	}
+
+
+//	String query = "match ()-[a:keyword_of]-() retur n a limit 20";
+	/*String query = "match (n:production)-[r:actress_in]-(p:person)"
+			+ " where id(n) = '4.1388625'"
+			+ " return id(r) as r_id, start(r) as r_head, \"end\"(r) as r_tail, properties(r) as r_props"
+			+ " , id(p) as p_id, p.name as p_name, properties(p) as p_props";*/
 	
+
+
 
 	/*public Map<String, Object> findEdge(String query) {
 		return jdbcTemplate.query(query, new ResultSetExtractor<Map<String, Object>>() {
