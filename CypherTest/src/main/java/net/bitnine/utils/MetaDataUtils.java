@@ -12,7 +12,7 @@ import net.bitnine.domain.DataMeta;
 public class MetaDataUtils {
 
 
-	public static List<DataMeta> setMetaData(ResultSetMetaData data) throws SQLException {
+	public static List<DataMeta> getMetaDataList (ResultSetMetaData data) throws SQLException {
 		List<DataMeta> dataMetaList = new ArrayList<>();
     	
         for(int i = 1 ; i <=data.getColumnCount() ; i++){

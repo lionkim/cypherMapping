@@ -59,7 +59,7 @@ class PathRowMapper implements RowMapper<Path>
     	
     	ResultSetMetaData data = rs.getMetaData();
 
-    	List<DataMeta> dataMetaList = MetaDataUtils.setMetaData(data);
+    	List<DataMeta> dataMetaList = MetaDataUtils.getMetaDataList(data);
     	path.setDataMetaList(dataMetaList);
  
         return path;

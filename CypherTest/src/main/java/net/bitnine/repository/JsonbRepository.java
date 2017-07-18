@@ -52,7 +52,7 @@ class JsonbRowMapper implements RowMapper<Jsonb>
     	
     	ResultSetMetaData data = rs.getMetaData();
 
-    	List<DataMeta> dataMetaList = MetaDataUtils.setMetaData(data);
+    	List<DataMeta> dataMetaList = MetaDataUtils.getMetaDataList(data);
     	jsonb.setDataMetaList(dataMetaList);
  
         return jsonb;

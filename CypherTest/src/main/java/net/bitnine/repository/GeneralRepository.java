@@ -95,7 +95,7 @@ class GeneralRowMapper implements RowMapper<General>
     	
     	ResultSetMetaData data = rs.getMetaData();
     	
-    	List<DataMeta> dataMetaList = MetaDataUtils.setMetaData(data);
+    	List<DataMeta> dataMetaList = MetaDataUtils.getMetaDataList(data);
         general.setDataMetaList(dataMetaList);
         
     	return general;

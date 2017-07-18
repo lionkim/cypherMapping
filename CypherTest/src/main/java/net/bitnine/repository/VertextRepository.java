@@ -52,7 +52,7 @@ class VertexRowMapper implements RowMapper<Vertex>
     	
     	ResultSetMetaData data = rs.getMetaData();
 
-    	List<DataMeta> dataMetaList = MetaDataUtils.setMetaData(data);
+    	List<DataMeta> dataMetaList = MetaDataUtils.getMetaDataList(data);
     	vertex.setDataMetaList(dataMetaList);
  
         return vertex;
