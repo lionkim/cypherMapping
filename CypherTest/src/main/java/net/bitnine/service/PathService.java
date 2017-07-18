@@ -1,10 +1,14 @@
 package net.bitnine.service;
 
+import static net.bitnine.controller.DataSourceController.DATASOURCE;
+
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,22 +22,24 @@ import net.sf.json.JSONObject;
 
 @Service
 public class PathService {
-
 	PathRepository pathRepository;
 
-	@Autowired private DatabaseService databaseService;
-
-	public List<Path> findPath (DataSourceDTO dataSourceDTO) {
-		DataSource dataSource = databaseService.createDataSource(dataSourceDTO);
+	public List<Path> findPath (String query, HttpServletRequest request) {
+		HttpSession session = request.getSession();
+		if (session.getAttribute(DATASOURCE) == null) {
+			return null;
+		}
+		DataSource dataSource = (DataSource) session.getAttribute(DATASOURCE);
+		System.out.println("dataSource: " + dataSource);
 
 		pathRepository = new PathRepository(dataSource);
 
-		List<Path> pathList = pathRepository.findPath();
+		List<Path> pathList = pathRepository.findPath(query);
 		
 		return pathList;
 	}
 	
-	public JSONObject createJson (List<Path> pathList, HttpServletResponse response) {
+	public JSONObject createJson (List<Path> pathList) {
 		JSONObject jsonObject = new JSONObject();
 		jsonObject.put("Meta", pathList.get(0).getDataMetaList());		// meta 데이터를 저장
 

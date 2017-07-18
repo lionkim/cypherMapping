@@ -36,8 +36,12 @@ public class PathRepository {
 			+ " id( (nodes(path))[length(path)+1] ) as TAIL";
 	
 	
-    @Transactional(readOnly=true)
+    /*@Transactional(readOnly=true)
     public List<Path> findPath() {
+        return jdbcTemplate.query(query, new PathRowMapper());
+    }*/
+    
+    public List<Path> findPath(String query) {
         return jdbcTemplate.query(query, new PathRowMapper());
     }
 }

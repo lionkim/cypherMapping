@@ -1,11 +1,15 @@
 package net.bitnine.service;
 
+import static net.bitnine.controller.DataSourceController.DATASOURCE;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,12 +29,43 @@ public class EdgeService {
 
 	@Autowired private DatabaseService databaseService;
 
-	public List<Edge> findEdge (DataSourceDTO dataSourceDTO) {
+	/*public List<Edge> findEdge (DataSourceDTO dataSourceDTO) {
 		DataSource dataSource = databaseService.createDataSource(dataSourceDTO);
 		
 		edgeRepository = new EdgeRepository(dataSource);
 		
 		List<Edge> edgeList = edgeRepository.findEdge();
+		
+		return edgeList;
+	}*/
+	
+
+	/*public List<Edge> findEdge (String query, HttpServletRequest request) {
+		HttpSession session = request.getSession();
+		if (session.getAttribute(DATASOURCE) == null) {
+			return null;
+		}
+		DataSource dataSource = (DataSource) session.getAttribute(DATASOURCE);
+		System.out.println("dataSource: " + dataSource);
+		
+		edgeRepository = new EdgeRepository(dataSource);
+		
+		List<Edge> edgeList = edgeRepository.findEdge(query);
+		
+		return edgeList;
+	}*/
+	
+	public Map<String, Object> findEdge (String query, HttpServletRequest request) {
+		HttpSession session = request.getSession();
+		if (session.getAttribute(DATASOURCE) == null) {
+			return null;
+		}
+		DataSource dataSource = (DataSource) session.getAttribute(DATASOURCE);
+		System.out.println("dataSource: " + dataSource);
+		
+		edgeRepository = new EdgeRepository(dataSource);
+		
+		Map<String, Object> edgeList = edgeRepository.findEdge(query);
 		
 		return edgeList;
 	}

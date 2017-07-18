@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
@@ -14,6 +15,7 @@ import javax.sql.DataSource;
 import org.json.simple.JSONObject;*/
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.core.JsonGenerationException;
@@ -56,13 +58,24 @@ public class EdgeController {
 		return createJson(edgeList);
 	}*/
 
-	@RequestMapping("/findEdge")
+    /*@RequestMapping("/findEdge")
 	public Map<String, Object> findEdge(DataSourceDTO dataSourceDTO) throws JsonProcessingException, IOException {
 //	public List<Edge> findEdge(DataSourceDTO dataSourceDTO) {
 		
 		List<Edge> edgeList = service.findEdge(dataSourceDTO);
 		
 		return service.createJson(edgeList);
+	}*/
+
+	@RequestMapping(value="/findEdge",method=RequestMethod.POST)
+//	public List<Map<String, Object>> findEdge(String query, HttpServletRequest request) throws JsonProcessingException, IOException {
+	public Map<String, Object> findEdge(String query, HttpServletRequest request) throws JsonProcessingException, IOException {
+	
+//		List<Edge> edgeList = service.findEdge(query, request);
+		
+		return service.findEdge(query, request);
+		
+		//return service.createJson(edgeList);
 	}
 	
 	

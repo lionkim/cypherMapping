@@ -6,10 +6,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -27,7 +29,7 @@ public class PathController {
 
 	@Autowired private PathService service;
 	
-	@RequestMapping("/findPath")
+	/*@RequestMapping("/findPath")
 	public JSONObject findPath(DataSourceDTO dataSourceDTO, HttpServletResponse response) {
 //	public String findPath(DataSourceDTO dataSourceDTO) {
 //	public void findPath(DataSourceDTO dataSourceDTO, HttpServletResponse response) {
@@ -37,8 +39,15 @@ public class PathController {
 		//return createJson(pathList, response);
 //		return createJson2(pathList);
 		return service.createJson(pathList, response);
+	}*/
+	
+	@RequestMapping(value="/findPath",method=RequestMethod.POST)
+	public JSONObject findPath(String query, HttpServletRequest request) {
+		
+		List<Path> pathList = service.findPath(query, request);
+		
+		return service.createJson(pathList);
 	}
-
 	
 	
 	

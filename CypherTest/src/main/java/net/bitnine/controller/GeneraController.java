@@ -1,63 +1,55 @@
 package net.bitnine.controller;
 
 import java.util.List;
+import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import net.bitnine.domain.General;
 import net.bitnine.domain.dto.DataSourceDTO;
 import net.bitnine.repository.GeneralRepository;
 import net.bitnine.service.DatabaseService;
+import net.bitnine.service.GeneralService;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 @RestController
 public class GeneraController {
-	GeneralRepository generalRepository;
 
-	@Autowired private DatabaseService databaseService;
+	@Autowired private GeneralService service;
 
-	@RequestMapping("/findGeneral")
+	/*@RequestMapping("/findGeneral")
 	public JSONObject findGeneral(DataSourceDTO dataSourceDTO, HttpServletResponse response)  {
-		DataSource dataSource = databaseService.createDataSource(dataSourceDTO);
-
-		generalRepository = new GeneralRepository(dataSource);
 		
-		List<General> generalList = generalRepository.findGeneral();
+		List<General> generalList = service.findGeneral(dataSourceDTO);
 
-		return createJson(generalList, response);
+		return service.createJson(generalList, response);
 	}
-
-	private JSONObject createJson(List<General> generalList, HttpServletResponse response) {
-		JSONObject jsonObject = new JSONObject();
-		jsonObject.put("Meta", generalList.get(0).getDataMetaList());
-
-		JSONArray jsonRowArray = new JSONArray();
+	@RequestMapping("/findGeneral")
+	public List<Map<String, Object>> findGeneral(String query, HttpServletRequest request, HttpServletResponse response)  {
 		
-		for (General general : generalList) {
-			JSONObject jsonObj = new JSONObject();
-
-			jsonObj.put("idA", general.getIdA());
-			jsonObj.put("labelA", general.getLabelA());
-			jsonObj.put("title", general.getTitle());
-			jsonObj.put("idB", general.getIdB());
-			jsonObj.put("labelB", general.getLabelB());
-			jsonObj.put("name", general.getName());
-			jsonObj.put("labelC", general.getLabelC());
-			jsonObj.put("idC", general.getIdC());
-			
-			jsonRowArray.add(jsonObj);
-		}
-		jsonObject.put("Rows", jsonRowArray);
-
-		return jsonObject;
+		List<Map<String, Object>> generalList = service.findGeneral(query, request);
+		
+		return generalList;
 	}
-	
+*/
+
+
+	@RequestMapping(value="/findGeneral",method=RequestMethod.POST)
+	public JSONObject findGeneral(String query, HttpServletRequest request)  {
+		
+		List<General> generalList = service.findGeneral(query, request);
+		
+		return service.createJson(generalList);
+	}
 }
 
 
