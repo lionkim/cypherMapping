@@ -116,7 +116,7 @@ public class JsonObjectRepository {
 			break;
 
         case "_vertex":
-            List<Vertex> vertexList = createParsedVertext(result);
+            List<Vertex> vertexList = createParsedVertextList(result);
             rowJsonObject.put(columnName, vertexList);
             break;
             
@@ -161,17 +161,28 @@ public class JsonObjectRepository {
         return new Edge (id, "Edge", name, source, target,  props);
 	}
 
-	public List<Vertex> createParsedVertext(String result) throws ParseException {
+	public List<Vertex> createParsedVertextList(String result) throws ParseException {
 
-        String node = result.substring(1, result.length()-1);      // distributed[8.965184][5.3494,4.7058]{}
+        String node = result.substring(1, result.length()-1);      // 결과물 양쪽 끝의 [, ] 를 제거 함.  ex) [distributed[8.965184][5.3494,4.7058]{}] => distributed[8.965184][5.3494,4.7058]{}
         
-        String strPattern = "[a-zA-Z]*\\[[0-9]\\.[0-9]*\\]"; // nodes에서 파싱하기위한 정규식. ex) 'production[4.1111...]{' 을 검색함.
+        String strPattern = "[a-zA-Z]*\\[[0-9]\\.[0-9]*\\]"; // nodes에서 파싱하기위한 정규식. ex) 'production[4.1111...]' 을 검색함.
 
         Pattern pattern = Pattern.compile(strPattern);
 
-        Matcher matcher = pattern.matcher(node);
+        Matcher countMatcher = pattern.matcher(node);
+        
+        int countMatcherNum = 0;        // matcherLocate 배열 크기를 정하기 위한 수.
+        while (countMatcher.find()) {
+            countMatcher.group(0);
 
-        int[] matcherLocate = new int[10];
+            countMatcher.start();       // 정규식으로 발견된 처음 위치
+            countMatcherNum++;
+            countMatcher.end();     // 정규식으로 발견된  끝 위치
+            countMatcherNum++;
+        }
+
+        Matcher matcher = pattern.matcher(node);
+        int[] matcherLocate = new int[countMatcherNum + 1];     // countMatcherNum에는 마지막 props는 포함되지 않으므로 하나 큰 배열을 생성
         
         // 정규 표현에 검색된 문자열 구하기
         // find() 메소드가 false 반환할 때까지 반복
@@ -183,8 +194,10 @@ public class JsonObjectRepository {
             matcherLocate[cnt++] = matcher.end();     // 정규식으로 발견된  끝 위치
         }
         matcherLocate[cnt] = node.length();
+        
+        System.out.println("matcherLocateLength: " + matcherLocate.length);
 
-        String[] vertexes = new String[10];         // vertex들을 담을 배열, ex) { production[4.812332],  company[3.4444],  movie[4.444234], .... }
+        String[] vertexes = new String[cnt];         // vertex들을 담을 배열, ex) { production[4.812332],  company[3.4444],  movie[4.444234], .... }
         
         for (int i = 0; i < cnt; i++) {
             
