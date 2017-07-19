@@ -2,6 +2,7 @@ package net.bitnine.service;
 
 import static net.bitnine.controller.DataSourceController.DATASOURCE;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -18,7 +19,7 @@ public class JsonObjectService {
 	JsonObjectRepository repository;
 
 	
-	public JSONObject getJson (String query, HttpServletRequest request) {
+	public JSONObject getJson (String query, HttpServletRequest request) throws UnsupportedEncodingException {
 		HttpSession session = request.getSession();
 		if (session.getAttribute(DATASOURCE) == null) {
 			return null;
