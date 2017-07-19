@@ -2,7 +2,7 @@ package net.bitnine.domain;
 
 import java.util.List;
 
-public class General implements Meta {
+public class General {
 
 	private String idA;
 	private String labelA;

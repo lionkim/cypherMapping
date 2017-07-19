@@ -3,109 +3,79 @@ package net.bitnine.domain;
 import java.math.BigDecimal;
 import java.util.List;
 
+import org.json.simple.JSONObject;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties({ "rProps", "pProps" })
 public class Edge  {
 
-	private BigDecimal rId;
-	private BigDecimal rHead;
-	private BigDecimal rTail;
-	private String rProps;
-	private BigDecimal pId;
-	private String pName;
-	private String pProps;
-	private List<DataMeta> dataMetaList;
+	private String id;
+	private String type;
+	private String name;
+	private String source;
+	private String target;
+	private JSONObject  props;
 	
 	public Edge() {
 	}
 
-	public Edge(BigDecimal rId, BigDecimal rHead, BigDecimal rTail, String rProps, BigDecimal pId, String pName,
-			String pProps, List<DataMeta> dataMetaList) {
-		this.rId = rId;
-		this.rHead = rHead;
-		this.rTail = rTail;
-		this.rProps = rProps;
-		this.pId = pId;
-		this.pName = pName;
-		this.pProps = pProps;
-		this.dataMetaList = dataMetaList;
+	public Edge(String id, String type, String name, String source, String target, JSONObject props) {
+		this.id = id;
+		this.type = type;
+		this.name = name;
+		this.source = source;
+		this.target = target;
+		this.props = props;
 	}
 
-	public Edge(BigDecimal rId, BigDecimal rHead, BigDecimal rTail, String rProps, BigDecimal pId, String pName,
-			String pProps) {
-		this.rId = rId;
-		this.rHead = rHead;
-		this.rTail = rTail;
-		this.rProps = rProps;
-		this.pId = pId;
-		this.pName = pName;
-		this.pProps = pProps;
+	public String getId() {
+		return id;
 	}
 
-	public BigDecimal getrId() {
-		return rId;
+	public void setId(String id) {
+		this.id = id;
 	}
 
-	public void setrId(BigDecimal rId) {
-		this.rId = rId;
+	public String getType() {
+		return type;
 	}
 
-	public BigDecimal getrHead() {
-		return rHead;
+	public void setType(String type) {
+		this.type = type;
 	}
 
-	public void setrHead(BigDecimal rHead) {
-		this.rHead = rHead;
+	public String getName() {
+		return name;
 	}
 
-	public BigDecimal getrTail() {
-		return rTail;
+	public void setName(String name) {
+		this.name = name;
 	}
 
-	public void setrTail(BigDecimal rTail) {
-		this.rTail = rTail;
+	public String getSource() {
+		return source;
 	}
 
-	public String getrProps() {
-		return rProps;
+	public void setSource(String source) {
+		this.source = source;
 	}
 
-	public void setrProps(String rProps) {
-		this.rProps = rProps;
+	public String getTarget() {
+		return target;
 	}
 
-	public BigDecimal getpId() {
-		return pId;
+	public void setTarget(String target) {
+		this.target = target;
 	}
 
-	public void setpId(BigDecimal pId) {
-		this.pId = pId;
+	public JSONObject getProps() {
+		return props;
 	}
 
-	public String getpName() {
-		return pName;
+	public void setProps(JSONObject props) {
+		this.props = props;
 	}
-
-	public void setpName(String pName) {
-		this.pName = pName;
-	}
-
-	public String getpProps() {
-		return pProps;
-	}
-
-	public void setpProps(String pProps) {
-		this.pProps = pProps;
-	}
-
-	public List<DataMeta> getDataMetaList() {
-		return dataMetaList;
-	}
-
-	public void setDataMetaList(List<DataMeta> dataMetaList) {
-		this.dataMetaList = dataMetaList;
-	}
-
+	
 	
 }

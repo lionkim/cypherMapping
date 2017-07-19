@@ -4,60 +4,52 @@ import java.util.List;
 
 public class Path {
 
-	private String head;
-	private String tail;
-	private String nodes;
-	private String edges;
-	
-	private List<DataMeta> dataMetaList;
-	
+	private String source;
+	private String target;
+
+	private List<Vertex> nodes;
+	private List<Edge> edges;
 
 	public Path() {
 	}
 
-
-	public Path(String head, String tail, String nodes, String edges, List<DataMeta> dataMetaList) {
-		this.head = head;
-		this.tail = tail;
+	public Path(String source, String target, List<Vertex> nodes, List<Edge> edges) {
+		this.source = source;
+		this.target = target;
 		this.nodes = nodes;
 		this.edges = edges;
-		this.dataMetaList = dataMetaList;
 	}
 
-
-	public String getHead() {
-		return head;
-	}
-	public void setHead(String head) {
-		this.head = head;
+	public String getSource() {
+		return source;
 	}
 
-	public String getTail() {
-		return tail;
-	}
-	public void setTail(String tail) {
-		this.tail = tail;
+	public void setSource(String source) {
+		this.source = source;
 	}
 
-	public String getNodes() {
+	public String getTarget() {
+		return target;
+	}
+
+	public void setTarget(String target) {
+		this.target = target;
+	}
+
+	public List<Vertex> getNodes() {
 		return nodes;
 	}
-	public void setNodes(String nodes) {
+
+	public void setNodes(List<Vertex> nodes) {
 		this.nodes = nodes;
 	}
 
-	public String getEdges() {
+	public List<Edge> getEdges() {
 		return edges;
 	}
-	public void setEdges(String edges) {
-		this.edges = edges;
-	}
 
-	public List<DataMeta> getDataMetaList() {
-		return dataMetaList;
-	}
-	public void setDataMetaList(List<DataMeta> dataMetaList) {
-		this.dataMetaList = dataMetaList;
+	public void setEdges(List<Edge> edges) {
+		this.edges = edges;
 	}
 	
 	
