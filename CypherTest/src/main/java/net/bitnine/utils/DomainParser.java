@@ -18,38 +18,111 @@ public class DomainParser {
         // [distributed[8.965184][5.3494,4.7058]{}]
         // distributed[8.965184][5.3494,4.7058]{}
         // distributed[   8.965184][   5.3494,4.7058]{}
-        
-        result = "[distributed[8.965184][5.3494,4.7058]{},distributed[8.965184][5.3494,4.7058]{},distributed[8.965184][5.3494,4.7058]{}]";
-        String squareRemovedResult = result.substring(1, result.length()-1);      // distributed[8.965184][5.3494,4.7058]{}
+//        result = "[distributed[8.965184][5.3494,4.7058]{},friend[2.965184][5.3494,4.7058]{},like[3.963384][5.3294,4.7511]{}]";
         String strPattern = "[a-zA-Z]*\\[[0-9]\\.[0-9]*\\]\\[[0-9]\\.[0-9]*\\,[0-9]\\.[0-9]*\\]"; // node를 파싱하기위한 정규식. ex) 'distributed[8.965184][5.3494,4.7058]' 을 검색함.
 
+        String squareRemovedResult = result.substring(1, result.length()-1);      // distributed[8.965184][5.3494,4.7058]{}
         Pattern pattern = Pattern.compile(strPattern);
 
         int countMatcherNum = getMatchersLength(squareRemovedResult, pattern);                               // 해당 패턴의 시작위치와 끝위치를 저장하는 배열의 크기 계산.
 
         int[] matcherLocate = createMatcherLocate(squareRemovedResult, pattern, countMatcherNum);      // 패턴에 일치하는 시작위치와 끝위치를 저장하는 배열을 생성. 이 위치를 사용하여 문자열을 짜를것임.
 
-        String[] vertexes = createVertexes(squareRemovedResult, countMatcherNum, matcherLocate);
+        // [distributed[8.965184][5.3494,4.7058], {}, distributed[8.965184][5.3494,4.7058], {}, distributed[8.965184][5.3494,4.7058], {}]
+        String[] edges = createNodes (squareRemovedResult, countMatcherNum, matcherLocate);
         
-        String[] split = squareRemovedResult.split("\\[");                             // [  distributed, 8.965184], 5.3494,4.7058]{}  ]
-        String name = split[0];                                         // distributed
-        String id = split[1].substring(0, split[1].length()-1);     // 8.965184
-
-        String[] sources = split[2].split("\\]");                   // [  5.3494,4.7058,  {}  ]
-        String[] sources1 = sources[0].split("\\,");             // [  5.3494, 4.7058  ]
-
-        String source = sources1[0];                                // 5.3494
-        String target = sources1[1];                                // 4.7058
+        List<Edge> edgeList = new ArrayList<>();
 
         JSONParser parser = new JSONParser();
-        JSONObject  props = (JSONObject) parser.parse(sources[1]);
         
-        Edge edge = new Edge (id, "Edge", name, source, target,  props);
-        List<Edge> edgeList = new ArrayList<>();
+        String[] edgeNames = new String[3];   
         
-        edgeList.add(edge);
+        for (int k = 0; k < edges.length; k++) {      // edge는 인덱스 2증가로 저장되있음.
+            // edge는 인덱스 2증가로 저장되있음.
+            edgeNames = edges[k].split("\\[");                  // ex) edges[k] = production[4.812332], vertexNames = { production, 4.812332] }
+            // int propsNum = k + 1; // 해당 edge의 props.
+
+            // distributed[8.965184][5.3494,4.7058]
+            // String[] split = edges[k].split("\\[");      // [ distributed,
+            // 8.965184], 5.3494,4.7058]{} ]
+            edgeNames = edges[k].split("\\[");      // [ distributed, 8.965184], 5.3494,4.7058] ]
+            String name = edgeNames[0];
+            String id = edgeNames[1].substring(0, edgeNames[1].length() - 1);       // 맨뒤에 "]"가 있으므로 전체길이에서 -1를 해줌   [ 8.965184 ]
+
+            String[] sources = edgeNames[2].split("\\]");           // [ 5.3494,4.7058, {} ]
+            String[] sources1 = sources[0].split("\\,");                // [ 5.3494, 4.7058 ]
+
+            String source = sources1[0];        // 5.3494
+            String target = sources1[1];        // 4.7058
+
+            // JSONParser parser = new JSONParser();
+            JSONObject props = (JSONObject) parser.parse(sources[1]);
+
+            Edge edge = new Edge(id, "Edge", name, source, target, props); // Edge 객체 생성
+
+            edgeList.add(edge);
+        }
         
         return edgeList;
+    }
+    
+    /**
+     * vertex들과 props들을 담을 배열 생성
+     * @param node
+     * @param countMatcherNum
+     * @param matcherLocate
+     * @return
+     */
+    private static String[] createNodes   (String beforeParsingString, int countMatcherNum, int[] matcherLocate) {
+        String[] nodes = new String[countMatcherNum / 2];        
+        
+        for (int i = 0, k = 0; i < countMatcherNum; i += 2, k++) {
+            
+            // edge의 시작 위치 값.  ex) // distributed[8.965184][5.3494,4.7058]{},friend[8.965184][5.3494,4.7058]{},like[8.965184][5.3494,4.7058]{} 이라면
+            int start = matcherLocate[i];          // d, f, l 위치값
+            int j = i+2;        // ,
+            
+            int end = 0;
+            // edge의 끝 위치 값.      ex)   } 위치값
+            if (i != countMatcherNum - 2) {     
+                end = matcherLocate[j] - 1;     // props 맨뒤의 "," 하나 이전으로 짜르기 위해
+            } else {        // 마지막일 때
+                end = matcherLocate[j];         // 마지막일 경우 "," 가 없으므로
+            }
+            nodes [k] = beforeParsingString.substring(start, end);   
+        }
+        return nodes;
+    }
+    
+
+
+    /**
+     * 실제 Vertex List를 생성하는 메소드
+     * @param countMatcherNum
+     * @param vertexes                      // 결과 문자열을 vertext 메타정보와 props를 파싱하여 저장된 배열 ex) { production[4.812332], {"id": 51, "kind": "episode", ..},  company[3.4444],  {"id": 15, "kind": "episode", ..}, .... }
+     * @return
+     * @throws ParseException
+     */
+    private static List<Vertex> getVertexList(int countMatcherNum, String[] vertexes) throws ParseException {
+        List<Vertex> vertextList = new ArrayList<>();
+
+        JSONParser parser = new JSONParser();
+        
+        String[] vertexNames = new String[2];   
+        
+        for (int k = 0; k < countMatcherNum; k += 2) {              // vertex는 인덱스 2증가로 저장되있음.
+            vertexNames = vertexes[k].split("\\[");     // ex) vertexes[k] = production[4.812332],   vertexNames = { production, 4.812332] }
+            String name = vertexNames[0];
+            String id = vertexNames[1].substring(0, vertexNames[1].length() - 1);       // 맨뒤에 "]"가 있으므로 전체길이에서 -1를 해줌
+            int propsNum = k + 1;       // 해당 vertex의 props. 
+            
+            JSONObject  props = (JSONObject) parser.parse(vertexes[propsNum]);
+            
+            Vertex vertex = new Vertex(id, "Vertex", name, props);          // Vertex 객체 생성
+            
+            vertextList.add(vertex);
+        }
+        return vertextList;
     }
     
     /**
@@ -65,7 +138,7 @@ public class DomainParser {
         String strPattern = "[a-zA-Z]*\\[[0-9]\\.[0-9]*\\]"; // node를 파싱하기위한 정규식. ex) 'production[4.1111...]' 을 검색함.
 
         Pattern pattern = Pattern.compile(strPattern);
-
+        
         int countMatcherNum = getMatchersLength(squareRemovedResult, pattern);                               // 해당 패턴의 시작위치와 끝위치를 저장하는 배열의 크기 계산.
 
         int[] matcherLocate = createMatcherLocate(squareRemovedResult, pattern, countMatcherNum);      // 패턴에 일치하는 시작위치와 끝위치를 저장하는 배열을 생성. 이 위치를 사용하여 문자열을 짜를것임.
@@ -146,34 +219,5 @@ public class DomainParser {
         }
         matcherLocate[countMatcherNum] = node.length();         // 배열의 마지막에는 node의 끝위치를 저장.
         return matcherLocate;
-    }
-
-    /**
-     * 실제 Vertex List를 생성하는 메소드
-     * @param countMatcherNum
-     * @param vertexes                      // 결과 문자열을 vertext 메타정보와 props를 파싱하여 저장된 배열 ex) { production[4.812332], {"id": 51, "kind": "episode", ..},  company[3.4444],  {"id": 15, "kind": "episode", ..}, .... }
-     * @return
-     * @throws ParseException
-     */
-    private static List<Vertex> getVertexList(int countMatcherNum, String[] vertexes) throws ParseException {
-        List<Vertex> vertextList = new ArrayList<>();
-
-        JSONParser parser = new JSONParser();
-        
-        String[] vertexNames = new String[2];   
-        
-        for (int k = 0; k < countMatcherNum; k += 2) {              // vertex는 인덱스 2증가로 저장되있음.
-            vertexNames = vertexes[k].split("\\[");     // ex) vertexes[k] = production[4.812332],   vertexNames = { production, 4.812332] }
-            String name = vertexNames[0];
-            String id = vertexNames[1].substring(0, vertexNames[1].length() - 1);       // 맨뒤에 "]"가 있으므로 전체길이에서 -1를 해줌
-            int propsNum = k + 1;       // 해당 vertex의 props. 
-            
-            JSONObject  props = (JSONObject) parser.parse(vertexes[propsNum]);
-            
-            Vertex vertex = new Vertex(id, "Vertex", name, props);          // Vertex 객체 생성
-            
-            vertextList.add(vertex);
-        }
-        return vertextList;
     }
 }
