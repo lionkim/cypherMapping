@@ -25,7 +25,7 @@ public class JsonObjectService {
 			return null;
 		}
 		DataSource dataSource = (DataSource) session.getAttribute(DATASOURCE);
-		System.out.println("dataSource: " + dataSource);
+//		System.out.println("dataSource: " + dataSource);
 		
 		repository = new JsonObjectRepository(dataSource);
 		

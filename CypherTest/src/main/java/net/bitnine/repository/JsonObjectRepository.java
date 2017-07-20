@@ -25,6 +25,7 @@ import org.springframework.stereotype.Repository;
 
 import net.bitnine.domain.DataMeta;
 import net.bitnine.domain.Edge;
+import net.bitnine.domain.Path;
 import net.bitnine.domain.Vertex;
 import net.bitnine.utils.DomainParser;
 import net.bitnine.utils.MetaDataUtils;
@@ -39,8 +40,10 @@ public class JsonObjectRepository {
 	}
 
 	public JSONObject getJson(String query) throws UnsupportedEncodingException {
-	    query = "match path=(a:production)-[]-(b:company) where id(a) = '4.7058' return nodes(path) as NODES, edges(path) as EDGES, id( (nodes(path))[1] ) as HEAD, id( (nodes(path))[length(path)+1] ) as TAIL";
+//	    query = "match path=(a:production)-[]-(b:company) where id(a) = '4.7058' return nodes(path) as NODES, edges(path) as EDGES, id( (nodes(path))[1] ) as HEAD, id( (nodes(path))[length(path)+1] ) as TAIL";
 
+	    System.out.println("query: " + query);
+	    
 		return jdbcTemplate.query(query, new ResultSetExtractor<JSONObject>() {
 			@Override
 			public JSONObject extractData(ResultSet resultSet) throws SQLException, DataAccessException {
@@ -113,7 +116,8 @@ public class JsonObjectRepository {
 			break;
 
 		case "graphpath":
-			rowJsonObject.put(columnName, (JSONObject) parser.parse(result));
+            List<Path> pathList = domainParser.createParsedPathList(result);
+            rowJsonObject.put(columnName, pathList);
 			break;
 
         case "_vertex":
