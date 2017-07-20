@@ -9,24 +9,69 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import net.bitnine.domain.Edge;
 import net.bitnine.domain.Vertex;
 
 public class DomainParser {
-    public static List<Vertex> createParsedVertextList(String result) throws ParseException {
-        result = "[production[4.7058]{\"id\": 51, \"kind\": \"episode\", \"title\": \"Haunted House\", \"md5sum\": \"9fae28455fdcdbcb6a725e501abea51a\", \"full_info\": [{\"tech info\": \"CAM:Arri Alexa\"}, {\"tech info\": \"CAM:Canon 5D Mark II SLR Camera, Canon Lenses\"}, {\"release dates\": \"Australia:26 November 2013\"}], \"season_nr\": 1, \"episode_nr\": 6, \"phonetic_code\": \"H532\", \"production_year\": 2013},company[5.3494]{\"id\": 5, \"name\": \"Australian Broadcasting Corporation (ABC)\", \"md5sum\": \"3543eb7b85c34815894baad029499929\", \"country_code\": \"[au]\", \"name_pcode_nf\": \"A2364\", \"name_pcode_sf\": \"A2364\"},movie[2.3494]{\"id\": 5, \"name\": \"Australian Broadcasting Corporation (ABC)\", \"md5sum\": \"3543eb7b85c34815894baad029499929\", \"country_code\": \"[au]\", \"name_pcode_nf\": \"A2364\", \"name_pcode_sf\": \"A2364\"}]";
+    
+    public static List<Edge> createParsedEdge(String result) throws ParseException {
+        // [distributed[8.965184][5.3494,4.7058]{}]
+        // distributed[8.965184][5.3494,4.7058]{}
+        // distributed[   8.965184][   5.3494,4.7058]{}
         
-        String node = result.substring(1, result.length()-1);      // 결과물 양쪽 끝의 [, ] 를 제거 함.  ex) [distributed[8.965184][5.3494,4.7058]{}] => distributed[8.965184][5.3494,4.7058]{}
-        
-        String strPattern = "[a-zA-Z]*\\[[0-9]\\.[0-9]*\\]"; // nodes에서 파싱하기위한 정규식. ex) 'production[4.1111...]' 을 검색함.
+        result = "[distributed[8.965184][5.3494,4.7058]{},distributed[8.965184][5.3494,4.7058]{},distributed[8.965184][5.3494,4.7058]{}]";
+        String squareRemovedResult = result.substring(1, result.length()-1);      // distributed[8.965184][5.3494,4.7058]{}
+        String strPattern = "[a-zA-Z]*\\[[0-9]\\.[0-9]*\\]\\[[0-9]\\.[0-9]*\\,[0-9]\\.[0-9]*\\]"; // node를 파싱하기위한 정규식. ex) 'distributed[8.965184][5.3494,4.7058]' 을 검색함.
 
         Pattern pattern = Pattern.compile(strPattern);
 
-        int countMatcherNum = getMatchersLength(node, pattern);                               // 해당 패턴의 시작위치와 끝위치를 저장하는 배열의 크기 계산.
+        int countMatcherNum = getMatchersLength(squareRemovedResult, pattern);                               // 해당 패턴의 시작위치와 끝위치를 저장하는 배열의 크기 계산.
 
-        int[] matcherLocate = createMatcherLocate(node, pattern, countMatcherNum);      // 패턴에 일치하는 시작위치와 끝위치를 저장하는 배열을 생성. 이 위치를 사용하여 문자열을 짜를것임.
+        int[] matcherLocate = createMatcherLocate(squareRemovedResult, pattern, countMatcherNum);      // 패턴에 일치하는 시작위치와 끝위치를 저장하는 배열을 생성. 이 위치를 사용하여 문자열을 짜를것임.
+
+        String[] vertexes = createVertexes(squareRemovedResult, countMatcherNum, matcherLocate);
+        
+        String[] split = squareRemovedResult.split("\\[");                             // [  distributed, 8.965184], 5.3494,4.7058]{}  ]
+        String name = split[0];                                         // distributed
+        String id = split[1].substring(0, split[1].length()-1);     // 8.965184
+
+        String[] sources = split[2].split("\\]");                   // [  5.3494,4.7058,  {}  ]
+        String[] sources1 = sources[0].split("\\,");             // [  5.3494, 4.7058  ]
+
+        String source = sources1[0];                                // 5.3494
+        String target = sources1[1];                                // 4.7058
+
+        JSONParser parser = new JSONParser();
+        JSONObject  props = (JSONObject) parser.parse(sources[1]);
+        
+        Edge edge = new Edge (id, "Edge", name, source, target,  props);
+        List<Edge> edgeList = new ArrayList<>();
+        
+        edgeList.add(edge);
+        
+        return edgeList;
+    }
+    
+    /**
+     * 파싱되지 않은 쿼리결과문자열을 파싱하여 VertextList를 생성하는 메소드
+     * @param result
+     * @return
+     * @throws ParseException
+     */
+    public static List<Vertex> createParsedVertextList(String result) throws ParseException {
+        
+        String squareRemovedResult = result.substring(1, result.length()-1);      // 결과물 양쪽 끝의 [, ] 를 제거 함.  ex) [distributed[8.965184][5.3494,4.7058]{}] => distributed[8.965184][5.3494,4.7058]{}
+        
+        String strPattern = "[a-zA-Z]*\\[[0-9]\\.[0-9]*\\]"; // node를 파싱하기위한 정규식. ex) 'production[4.1111...]' 을 검색함.
+
+        Pattern pattern = Pattern.compile(strPattern);
+
+        int countMatcherNum = getMatchersLength(squareRemovedResult, pattern);                               // 해당 패턴의 시작위치와 끝위치를 저장하는 배열의 크기 계산.
+
+        int[] matcherLocate = createMatcherLocate(squareRemovedResult, pattern, countMatcherNum);      // 패턴에 일치하는 시작위치와 끝위치를 저장하는 배열을 생성. 이 위치를 사용하여 문자열을 짜를것임.
 
         // vertex들과 props들을 담을 배열, ex) { production[4.812332], {"id": 51, "kind": "episode", ..},  company[3.4444],  {"id": 5, "kind": "episode", ..}, movie[4.444234], {"id": 15, "kind": "episode", ..}, .... }
-        String[] vertexes = createVertexes(node, countMatcherNum, matcherLocate);
+        String[] vertexes = createVertexes(squareRemovedResult, countMatcherNum, matcherLocate);
         
         List<Vertex> vertextList = getVertexList(countMatcherNum, vertexes);
 
@@ -124,7 +169,8 @@ public class DomainParser {
             int propsNum = k + 1;       // 해당 vertex의 props. 
             
             JSONObject  props = (JSONObject) parser.parse(vertexes[propsNum]);
-            Vertex vertex = new Vertex(id, "Vertex", name, props);
+            
+            Vertex vertex = new Vertex(id, "Vertex", name, props);          // Vertex 객체 생성
             
             vertextList.add(vertex);
         }

@@ -122,7 +122,7 @@ public class JsonObjectRepository {
             break;
             
         case "_edge":
-            rowJsonObject.put(columnName, createParsedEdge(result));
+            rowJsonObject.put(columnName, domainParser.createParsedEdge(result));
             break;
 
 		/*
@@ -140,27 +140,7 @@ public class JsonObjectRepository {
 		}
 	}
 	
-	private Edge createParsedEdge(String result) throws ParseException {
-        // [distributed[8.965184][5.3494,4.7058]{}]
-        // distributed[8.965184][5.3494,4.7058]{}
-        // distributed[   8.965184][   5.3494,4.7058]{}
-
-        String node = result.substring(1, result.length()-1);      // distributed[8.965184][5.3494,4.7058]{}
-        String[] split = node.split("\\[");                             // [  distributed, 8.965184], 5.3494,4.7058]{}  ]
-        String name = split[0];                                         // distributed
-        String id = split[1].substring(0, split[1].length()-1);     // 8.965184
-
-        String[] sources = split[2].split("\\]");                   // [  5.3494,4.7058,  {}  ]
-        String[] sources1 = sources[0].split("\\,");             // [  5.3494, 4.7058  ]
-
-        String source = sources1[0];                                // 5.3494
-        String target = sources1[1];                                // 4.7058
-
-        JSONParser parser = new JSONParser();
-        JSONObject  props = (JSONObject) parser.parse(sources[1]);
-        
-        return new Edge (id, "Edge", name, source, target,  props);
-	}
+	
 
 	
 
