@@ -19,7 +19,7 @@ public class DomainParser {
     public List<Path> createParsedPathList(String result) {
         String squareRemovedResult = result.substring(1, result.length()-1);      // 결과물 양쪽 끝의 [, ] 를 제거 함.  ex) [distributed[8.965184][5.3494,4.7058]{}] => distributed[8.965184][5.3494,4.7058]{}
 
-        String strPattern = "[a-zA-Z]*\\[[0-9]\\.[0-9]*\\]\\[[0-9]\\.[0-9]*\\,[0-9]\\.[0-9]*\\]"; // result 를 파싱하기위한 정규식. ex) Edge 'distributed[8.965184][5.3494,4.7058]' 를 검색함.
+        String strPattern = "w*\\[[0-9]*\\.[0-9]*\\]\\[[0-9]*\\.[0-9]*\\,[0-9]*\\.[0-9]*\\]"; // result 를 파싱하기위한 정규식. ex) Edge 'distributed[8.965184][5.3494,4.7058]' 를 검색함.
 
         Pattern pattern = Pattern.compile(strPattern);
         
@@ -34,7 +34,7 @@ public class DomainParser {
         // distributed[8.965184][5.3494,4.7058]{}
         // distributed[   8.965184][   5.3494,4.7058]{}
 //        result = "[distributed[8.965184][5.3494,4.7058]{},friend[2.965184][5.3494,4.7058]{},like[3.963384][5.3294,4.7511]{}]";
-        String strPattern = "[a-zA-Z]*\\[[0-9]\\.[0-9]*\\]\\[[0-9]\\.[0-9]*\\,[0-9]\\.[0-9]*\\]"; // node를 파싱하기위한 정규식. ex) 'distributed[8.965184][5.3494,4.7058]' 을 검색함.
+        String strPattern = "[a-zA-Z]*\\[[0-9]*\\.[0-9]*\\]\\[[0-9]\\.[0-9]*\\,[0-9]\\.[0-9]*\\]"; // node를 파싱하기위한 정규식. ex) 'distributed[8.965184][5.3494,4.7058]' 을 검색함.
 
         String squareRemovedResult = result.substring(1, result.length()-1);      // distributed[8.965184][5.3494,4.7058]{}
         Pattern pattern = Pattern.compile(strPattern);
