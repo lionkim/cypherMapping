@@ -22,7 +22,24 @@ public class JsonObjectTest {
         String result = "[person[3.14]{\"id\": 1370, \"name\": \"Aaron, Alex\", \"gender\": \"m\", \"md5sum\": \"4dd5ad09d650f8c04f7e88035fb12512\", \"name_pcode_cf\": \"A6542\", \"name_pcode_nf\": \"A4265\", \"surname_pcode\": \"A65\"},actor_in[30.6642][3.14,4.3875135]{\"md5sum\": \"6e7ad9b8cbd15010cb39e80d80d7e753\", \"role_name\": \"Arthur\", \"name_pcode_nf\": \"A636\", \"surname_pcode\": null},production[4.3875135]{\"id\": 3898645, \"kind\": \"movie\", \"title\": \"Swallow\", \"md5sum\": \"c706cc6d6a60f2765f4038fb1e0020e2\", \"full_info\": [{\"plot\": \"Swallow is the exploration of a man, whose idea of the world was shaped through guilt and shame. Swallow explores this man's life by means of an organic stream of consciousness where all things have already happened and represent the flashes of images that would likely happen in a single moment.\"}, {\"color info\": \"Color\"}, {\"countries\": \"USA\"}, {\"genres\": \"Fantasy\"}, {\"genres\": \"Short\"}, {\"languages\": \"English\"}, {\"runtimes\": \"14\"}, {\"release dates\": \"USA:21 September 2013\"}], \"imdb_index\": \"IV\", \"phonetic_code\": \"S4\", \"production_year\": 2013}]";
 //        List<Vertex> vertexList = domainParser.createParsedVertextList(result);
 //        System.out.println("vertexList: " + vertexList);
-        domainParser.createParsedPathList(result);
+//        domainParser.createParsedPathList(result);
+        
+        
+        String string = "var1[value1], var2[value2], var3[value3]";
+        Pattern pattern = Pattern.compile("(\\[)(.*?)(\\])");
+        Matcher matcher = pattern.matcher(string);
+
+        List<String> listMatches = new ArrayList<String>();
+
+        while(matcher.find())
+        {
+            listMatches.add(matcher.group(4));
+        }
+
+        for(String s : listMatches)
+        {
+            System.out.println(s);
+        }
         
         
     }

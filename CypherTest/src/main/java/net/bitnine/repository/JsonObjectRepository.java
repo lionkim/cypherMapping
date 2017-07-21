@@ -28,6 +28,7 @@ import net.bitnine.domain.Edge;
 import net.bitnine.domain.Path;
 import net.bitnine.domain.Vertex;
 import net.bitnine.utils.DomainParser;
+import net.bitnine.utils.EdgeParser;
 import net.bitnine.utils.MetaDataUtils;
 
 @Repository
@@ -83,6 +84,8 @@ public class JsonObjectRepository {
 	private void setChangeType(ResultSet resultSet, ResultSetMetaData resultSetMetaData, JSONObject rowJsonObject,
 			int cnt) throws ParseException, SQLException {
 	    DomainParser domainParser = new DomainParser();
+	    EdgeParser edgeParser = new EdgeParser();
+	    
 		JSONParser parser = new JSONParser();
 		String columnTypeName = resultSetMetaData.getColumnTypeName(cnt);
 
@@ -126,7 +129,7 @@ public class JsonObjectRepository {
             break;
             
         case "_edge":
-            rowJsonObject.put(columnName, domainParser.createParsedEdge(result));
+            rowJsonObject.put(columnName, edgeParser.createParsedEdge(result));
             break;
 
 		/*

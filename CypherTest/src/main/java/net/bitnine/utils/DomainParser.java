@@ -29,50 +29,7 @@ public class DomainParser {
         return null;
     }
     
-    public List<Edge> createParsedEdge(String result) throws ParseException {
-        // [distributed[8.965184][5.3494,4.7058]{}]
-        // distributed[8.965184][5.3494,4.7058]{}
-        // distributed[   8.965184][   5.3494,4.7058]{}
-//        result = "[distributed[8.965184][5.3494,4.7058]{},friend[2.965184][5.3494,4.7058]{},like[3.963384][5.3294,4.7511]{}]";
-        String strPattern = "[a-zA-Z]*\\[[0-9]*\\.[0-9]*\\]\\[[0-9]\\.[0-9]*\\,[0-9]\\.[0-9]*\\]"; // node를 파싱하기위한 정규식. ex) 'distributed[8.965184][5.3494,4.7058]' 을 검색함.
-
-        String squareRemovedResult = result.substring(1, result.length()-1);      // distributed[8.965184][5.3494,4.7058]{}
-        Pattern pattern = Pattern.compile(strPattern);
-
-        int countMatcherNum = getMatchersLength(squareRemovedResult, pattern);                               // 해당 패턴의 시작위치와 끝위치를 저장하는 배열의 크기 계산.
-
-        int[] matcherLocate = createMatcherLocate(squareRemovedResult, pattern, countMatcherNum);      // 패턴에 일치하는 시작위치와 끝위치를 저장하는 배열을 생성. 이 위치를 사용하여 문자열을 짜를것임.
-
-        // [distributed[8.965184][5.3494,4.7058], {}, distributed[8.965184][5.3494,4.7058], {}, distributed[8.965184][5.3494,4.7058], {}]
-        String[] edges = createNodes (squareRemovedResult, countMatcherNum, matcherLocate);
-        int edgesLength = edges.length;
-        
-        List<Edge> edgeList = new ArrayList<>();
-
-        JSONParser parser = new JSONParser();
-        
-        String[] edgeNames = new String[edgesLength];   
-        
-        for (int k = 0; k < edgesLength; k++) {
-            edgeNames = edges[k].split("\\[");      // ex) edges[k] = distributed[8.965184][5.3494,4.7058]{}
-            String name = edgeNames[0];
-            String id = edgeNames[1].substring(0, edgeNames[1].length() - 1);       // 맨뒤에 "]"가 있으므로 전체길이에서 -1를 해줌   [ 8.965184 ]
-
-            String[] sourceAndTargetAndProps = edgeNames[2].split("\\]");           // 5.3494,4.7058, {}
-            String[] sourceAndTargets = sourceAndTargetAndProps[0].split("\\,");                // 5.3494, 4.7058 
-
-            String source = sourceAndTargets[0];        // 5.3494
-            String target = sourceAndTargets[1];        // 4.7058
-
-            JSONObject props = (JSONObject) parser.parse(sourceAndTargetAndProps[1]);       // {}
-
-            Edge edge = new Edge(id, "Edge", name, source, target, props); // Edge 객체 생성
-
-            edgeList.add(edge);
-        }
-        
-        return edgeList;
-    }
+   
     
     /**
      * vertex들과 props들을 담을 배열 생성
@@ -81,7 +38,7 @@ public class DomainParser {
      * @param matcherLocate
      * @return
      */
-    private String[] createNodes   (String beforeParsingString, int countMatcherNum, int[] matcherLocate) {
+    protected String[] createNodes   (String beforeParsingString, int countMatcherNum, int[] matcherLocate) {
         String[] nodes = new String[countMatcherNum / 2];        
         
         for (int i = 0, k = 0; i < countMatcherNum; i += 2, k++) {
@@ -142,9 +99,10 @@ public class DomainParser {
     public List<Vertex> createParsedVertextList(String result) throws ParseException {
         
         String squareRemovedResult = result.substring(1, result.length()-1);      // 결과물 양쪽 끝의 [, ] 를 제거 함.  ex) [distributed[8.965184][5.3494,4.7058]{}] => distributed[8.965184][5.3494,4.7058]{}
-        
-        String strPattern = "[a-zA-Z]*\\[[0-9]\\.[0-9]*\\]"; // node를 파싱하기위한 정규식. ex) 'production[4.1111...]' 을 검색함.
 
+        String strPattern = "[a-zA-Z]*\\[[0-9]\\.[0-9]*\\]"; // node를 파싱하기위한 정규식. ex) 'production[4.1111...]' 을 검색함.
+//        String strPattern = "[a-zA-Z]*\\[[0-9]+(.[0-9])\\]"; // node를 파싱하기위한 정규식. ex) 'production[4.1111...]' 을 검색함.
+        
         Pattern pattern = Pattern.compile(strPattern);
         
         int countMatcherNum = getMatchersLength(squareRemovedResult, pattern);                               // 해당 패턴의 시작위치와 끝위치를 저장하는 배열의 크기 계산.
@@ -158,6 +116,9 @@ public class DomainParser {
 
         return vertextList;
     }
+    
+    
+    
 
     /**
      * vertex들과 props들을 담을 배열 생성
@@ -189,7 +150,7 @@ public class DomainParser {
      * @param pattern
      * @return
      */
-    private int getMatchersLength(String node, Pattern pattern) {
+    protected int getMatchersLength(String node, Pattern pattern) {
         
         int countMatcherNum = 0;        // matcherLocate 배열 크기를 정하기 위한 수.
         
@@ -212,7 +173,7 @@ public class DomainParser {
      * @param countMatcherNum
      * @return
      */
-    private int[] createMatcherLocate(String node, Pattern pattern, int countMatcherNum) {
+    protected int[] createMatcherLocate(String node, Pattern pattern, int countMatcherNum) {
         Matcher matcher = pattern.matcher(node);
         int[] matcherLocate = new int[countMatcherNum + 1];     // countMatcherNum에는 마지막 props는 포함되지 않으므로 하나 큰 배열을 생성
         
