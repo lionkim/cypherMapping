@@ -13,7 +13,7 @@ import net.bitnine.domain.Edge;
 
 public class EdgeParser extends DomainParser{
     
-    public List<Edge> createParsedEdge(String result) throws ParseException {
+    /*public List<Edge> createParsedEdge(String result) throws ParseException {
         // [distributed[8.965184][5.3494,4.7058]{}]
         // distributed[8.965184][5.3494,4.7058]{}
         // distributed[   8.965184][   5.3494,4.7058]{}
@@ -36,49 +36,57 @@ public class EdgeParser extends DomainParser{
         return edgeList;
     }
     
-    /**
+    *//**
      * 패턴에 일치하는 시작위치와 끝위치를 저장하는 배열을 생성
      * @param node
      * @param pattern
      * @param countMatcherNum
      * @return
-     */
+     *//*
     private List<Edge> testingCreateMatcherLocate(String node, Pattern pattern, int countMatcherNum) {
         Matcher matcher = pattern.matcher(node);
-        int[] matcherLocate = new int[countMatcherNum + 1];     // countMatcherNum에는 마지막 props는 포함되지 않으므로 하나 큰 배열을 생성
 
         JSONParser parser = new JSONParser();
         
         List<Edge> edgeList = new ArrayList<>();
         
+        String[] edgeStringFields = new String[10];
+        int[] matcherLocate = new int[countMatcherNum + 1];     // countMatcherNum에는 마지막 props는 포함되지 않으므로 하나 큰 배열을 생성
+        
         // 정규 표현에 검색된 문자열 구하기
         // find() 메소드가 false 반환할 때까지 반복
+        int stringFieldCount = 0;
+        while (matcher.find()) {
+            matcher.group(0);
+            edgeStringFields[stringFieldCount++] = matcher.group(1);
+            edgeStringFields[stringFieldCount++] = matcher.group(2); 
+            edgeStringFields[stringFieldCount++] = matcher.group(3);        // 5.3494
+            edgeStringFields[stringFieldCount++] = matcher.group(4);        // 4.7058
+        }
         int cnt = 0;
         while (matcher.find()) {
             matcher.group(0);
 
-            int start = matcher.start();       // 정규식으로 발견된 처음 위치
-            int end = matcher.end();       // 정규식으로 발견된 처음 위치
-            String name = matcher.group(1);
-            String id = matcher.group(2);       // 맨뒤에 "]"가 있으므로 전체길이에서 -1를 해줌   [ 8.965184 ]
-//            String id = edgeNames[1].substring(0, edgeNames[1].length() - 1);       // 맨뒤에 "]"가 있으므로 전체길이에서 -1를 해줌   [ 8.965184 ]
-
-            String source = matcher.group(3);        // 5.3494
-            String target = matcher.group(4);        // 4.7058
-
-            JSONObject props = new JSONObject();
-//                    (JSONObject) parser.parse(sourceAndTargetAndProps[1]);       // {}
-
-            Edge edge = new Edge(id, "Edge", name, source, target, props); // Edge 객체 생성
-
-            edgeList.add(edge);
+            matcherLocate[cnt++] = matcher.start();       // 정규식으로 발견된 처음 위치
+            matcherLocate[cnt++] = matcher.end();       // 정규식으로 발견된 처음 위치
         }
+        
+        node.substring(
+
+        JSONObject props = new JSONObject();
+//                (JSONObject) parser.parse(sourceAndTargetAndProps[1]);       // {}
+
+        Edge edge = new Edge(id, "Edge", name, source, target, props); // Edge 객체 생성
+
+        edgeList.add(edge);
+        
+        
         matcherLocate[countMatcherNum] = node.length();         // 배열의 마지막에는 node의 끝위치를 저장.
         return edgeList;
-    }
+    }*/
     
     
-    /*public List<Edge> createParsedEdge(String result) throws ParseException {
+    public List<Edge> createParsedEdge(String result) throws ParseException {
         // [distributed[8.965184][5.3494,4.7058]{}]
         // distributed[8.965184][5.3494,4.7058]{}
         // distributed[   8.965184][   5.3494,4.7058]{}
@@ -121,5 +129,5 @@ public class EdgeParser extends DomainParser{
         }
         
         return edgeList;
-    }*/
+    }
 }

@@ -30,6 +30,8 @@ import net.bitnine.domain.Vertex;
 import net.bitnine.utils.DomainParser;
 import net.bitnine.utils.EdgeParser;
 import net.bitnine.utils.MetaDataUtils;
+import net.bitnine.utils.PathParser;
+import net.bitnine.utils.VertexParser;
 
 @Repository
 public class JsonObjectRepository {
@@ -84,7 +86,9 @@ public class JsonObjectRepository {
 	private void setChangeType(ResultSet resultSet, ResultSetMetaData resultSetMetaData, JSONObject rowJsonObject,
 			int cnt) throws ParseException, SQLException {
 	    DomainParser domainParser = new DomainParser();
+	    PathParser pathParser = new PathParser();
 	    EdgeParser edgeParser = new EdgeParser();
+	    VertexParser vertexParser = new VertexParser();
 	    
 		JSONParser parser = new JSONParser();
 		String columnTypeName = resultSetMetaData.getColumnTypeName(cnt);
@@ -119,12 +123,12 @@ public class JsonObjectRepository {
 			break;
 
 		case "graphpath":
-            List<Path> pathList = domainParser.createParsedPathList(result);
+            List<Path> pathList = pathParser.createParsedPathList(result);
             rowJsonObject.put(columnName, pathList);
 			break;
 
         case "_vertex":
-            List<Vertex> vertexList = domainParser.createParsedVertextList(result);
+            List<Vertex> vertexList = vertexParser.createParsedVertextList(result);
             rowJsonObject.put(columnName, vertexList);
             break;
             
