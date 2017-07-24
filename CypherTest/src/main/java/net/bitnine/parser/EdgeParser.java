@@ -15,10 +15,9 @@ import org.postgresql.util.PSQLException;
 import org.postgresql.util.PSQLState;
 
 import net.bitnine.domain.Edge;
-import net.bitnine.utils.DomainParser;
 import net.bitnine.utils.TopCommaTokenizer;
 
-public class EdgeParser extends DomainParser{
+public class EdgeParser {
     private static Pattern _pattern;
     static {
         _pattern = Pattern.compile("(.+)\\[(\\d+)\\.(\\d+)\\]\\[(\\d+)\\.(\\d+),(\\d+)\\.(\\d+)\\](.*)");
@@ -29,8 +28,6 @@ public class EdgeParser extends DomainParser{
         List<Edge> edgeList = new ArrayList<>();
          
         for (int i = 0; i < topCommaTokenizer.getSize(); i++) {
-            System.out.println("edgeToken: " + topCommaTokenizer.getToken(i));
-
             String p = PGtokenizer.removeBox(topCommaTokenizer.getToken(i));
             
             Edge edge = createParsedEdge(p);

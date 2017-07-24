@@ -15,22 +15,21 @@ import org.postgresql.util.PSQLException;
 import org.postgresql.util.PSQLState;
 
 import net.bitnine.domain.Vertex;
-import net.bitnine.utils.DomainParser;
 import net.bitnine.utils.TopCommaTokenizer;
 
-public class VertexParser  extends DomainParser {
+public class VertexParser {
     private static final Pattern _pattern;
+    
     static {
         _pattern = Pattern.compile("(.+)\\[(\\d+)\\.(\\d+)\\](.*)");
     }
-
 
     public List<Vertex> createParsedVertextList(String result) throws SQLException, ParseException {
         TopCommaTokenizer topCommaTokenizer = new TopCommaTokenizer(result);
         List<Vertex> vertextList = new ArrayList<>();
          
         for (int i = 0; i < topCommaTokenizer.getSize(); i++) {
-            System.out.println("topCommaTokenizer.getToken: " + topCommaTokenizer.getToken(i));
+//            System.out.println("topCommaTokenizer.getToken: " + topCommaTokenizer.getToken(i));
 
             String p = PGtokenizer.removeBox(topCommaTokenizer.getToken(i));
             
@@ -65,8 +64,7 @@ public class VertexParser  extends DomainParser {
             else
                 props = (JSONObject) parser.parse(property);
         } else {
-            throw new PSQLException(GT.tr("Conversion to type {0} failed: {1}.", new Object[]{type, result}),
-                    PSQLState.DATA_TYPE_MISMATCH);
+            throw new PSQLException(GT.tr("Conversion to type {0} failed: {1}.", new Object[]{type, result}), PSQLState.DATA_TYPE_MISMATCH);
         }
 
         return new Vertex(id, type, name, props);

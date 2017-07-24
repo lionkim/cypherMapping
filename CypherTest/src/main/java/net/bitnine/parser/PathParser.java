@@ -3,7 +3,6 @@ package net.bitnine.parser;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import org.json.simple.parser.ParseException;
 import org.postgresql.util.GT;
@@ -14,14 +13,13 @@ import org.postgresql.util.PSQLState;
 import net.bitnine.domain.Path;
 import net.bitnine.domain.Edge;
 import net.bitnine.domain.Vertex;
-import net.bitnine.utils.DomainParser;
 import net.bitnine.utils.TopCommaTokenizer;
 
-public class PathParser extends DomainParser {
+public class PathParser {
     
     public Path createParsedPath (String result) throws SQLException, ParseException {
         String type = "path";
-        List<Vertex> vertexs = new ArrayList<>();
+        List<Vertex> vertices = new ArrayList<>();
         List<Edge> edges = new ArrayList<>();
         VertexParser vertexParser = new VertexParser();
         EdgeParser edgeParser = new EdgeParser();
@@ -48,12 +46,12 @@ public class PathParser extends DomainParser {
                 if (i == 0) source = vertex.getId();
                 if (i == t.getSize() - 1) target = vertex.getId();
                 
-                vertexs.add(vertex);
+                vertices.add(vertex);
             }
             else {
                 edges.add(edgeParser.createParsedEdge(t.getToken(i)));
             }
         }
-        return new Path(source, target, vertexs, edges);
+        return new Path(source, target, vertices, edges);
     }
 }

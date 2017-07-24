@@ -1,6 +1,7 @@
 package net.bitnine.repository;
 
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -87,7 +88,6 @@ public class JsonObjectRepository {
 
 	private void setChangeType(ResultSet resultSet, ResultSetMetaData resultSetMetaData, JSONObject rowJsonObject,
 			int cnt) throws ParseException, SQLException {
-	    DomainParser domainParser = new DomainParser();
 	    PathParser pathParser = new PathParser();
 	    EdgeParser edgeParser = new EdgeParser();
 	    VertexParser vertexParser = new VertexParser();
@@ -95,8 +95,11 @@ public class JsonObjectRepository {
 		JSONParser parser = new JSONParser();
 		String columnTypeName = resultSetMetaData.getColumnTypeName(cnt);
 
-		String columnName = resultSetMetaData.getColumnLabel(cnt).toUpperCase();
+//		String columnName = resultSetMetaData.getColumnLabel(cnt).toUpperCase();
+		String columnName = resultSetMetaData.getColumnLabel(cnt);
 		String result = resultSet.getString(columnName);
+		
+		System.out.println("columnTypeName: " + columnTypeName);
 
 		switch (columnTypeName) {
 
@@ -106,6 +109,27 @@ public class JsonObjectRepository {
 			rowJsonObject.put(columnName, longResult);
 			break;
 
+        case "int4":
+            Integer integer4Result = Integer.parseInt(result);
+            System.out.println("int4\n");
+            rowJsonObject.put(columnName, integer4Result);
+            break;
+
+        case "int8":
+            long int8Result = Long.parseLong(result);
+            rowJsonObject.put(columnName, int8Result);
+            break;
+            
+        case "decimal":
+            BigDecimal decimalResult = new BigDecimal(result);
+            rowJsonObject.put(columnName, decimalResult);
+            break;
+            
+        case "numeric":
+            BigDecimal numericResult = new BigDecimal(result);
+            rowJsonObject.put(columnName, numericResult);
+            break;
+            
 		case "varchar":
 			rowJsonObject.put(columnName, result);
 			break;
@@ -125,38 +149,33 @@ public class JsonObjectRepository {
 			break;
 
 		case "graphpath":
-//            List<Path> pathList = pathParser.createParsedPathList(result);
 		    Path path = pathParser.createParsedPath(result);
             rowJsonObject.put(columnName, path);
 			break;
 
+        case "vertex":
+            Vertex vertext = vertexParser.createParsedVertext(result);
+            rowJsonObject.put(columnName, vertext);
+            break;
+            
+        case "edge":
+            rowJsonObject.put(columnName, edgeParser.createParsedEdge(result));
+            break;
+
         case "_vertex":
-        	List<Vertex> vertextList = vertexParser.createParsedVertextList(result);
+            List<Vertex> vertextList = vertexParser.createParsedVertextList(result);
             rowJsonObject.put(columnName, vertextList);
             break;
             
         case "_edge":
-//            rowJsonObject.put(columnName, edgeParser.createParsedEdge(result));
             rowJsonObject.put(columnName, edgeParser.createParsedVertextList(result));
             break;
-
-		/*
-		 * 
-		 * case "EDGE": return new Long(result);
-		 * 
-		 * case "PATH": return new Long(result);
-		 */
 
 		default:
 			rowJsonObject.put(columnName, result);
 			break;
-		// return result;
-
 		}
 	}
-	
-	
-
 	
 
 	public void getJsonData(String node) throws ParseException {
@@ -179,53 +198,6 @@ public class JsonObjectRepository {
 			map.put(key, value);
 			i++;
 		}
-		
-		/*
-
-		출처: http: // jgh6371.tistory.com/50 [Java Story]
-		try {
-			// JSONArray jArray = new JSONArray(result);
-
-			Set key = map.keySet();
-			for (int i = 0; i < jsonObject.size(); i++) {
-				jsonObject.arrNames[i] = jsonObject.names(i);
-			}
-			for (int i = 0; i < ja.length(); ++i) {
-				JSONObject jo = ja.getJSONObject(i);
-				arrNames[i] = jo.names(i);
-				Log.i("Connect->getJsonData", jo.getString("tableno"));
-			}
-		} catch (Exception e) {
-			Log.e("ConnectToDatabase->getJsonData", "Error Parsing JSON Data " + e.toString());
-		}*/
 	}
-
-	/*
-	 * private Vertex parseVertext(String result) { String strPattern =
-	 * "[a-zA-Z]*\\[[0-9]\\.[0-9]*\\]\\{"; // nodes에서 파싱하기위한 정규식. ex)
-	 * 'production[4.1111...]{' 을 발견함.
-	 * 
-	 * Pattern pattern = Pattern.compile(strPattern);
-	 * 
-	 * Matcher matcher = pattern.matcher(result);
-	 * 
-	 * int[] matcherLocate = new int[4]; // nodes에 production과 company 2개가 있어서
-	 * 처음과 마지막위치를 저장하기 위해 배열크기를 4로 함.
-	 * 
-	 * // 정규 표현에 검색된 문자열 구하기 // find() 메소드가 false 반환할 때까지 반복 int cnt = 0; while
-	 * (matcher.find()) { matcher.group(0);
-	 * 
-	 * matcherLocate[cnt] = matcher.start(); // 정규식으로 발견된 처음 위치 cnt++;
-	 * 
-	 * matcherLocate[cnt] = matcher.end(); // 정규식으로 발견된 끝 위치 cnt++; } }
-	 */
-
-	// String query = "match ()-[a:keyword_of]-() retur n a limit 20";
-	/*
-	 * String query = "match (n:production)-[r:actress_in]-(p:person)" +
-	 * " where id(n) = '4.1388625'" +
-	 * " return id(r) as r_id, start(r) as r_head, \"end\"(r) as r_tail, properties(r) as r_props"
-	 * + " , id(p) as p_id, p.name as p_name, properties(p) as p_props";
-	 */
 
 }
