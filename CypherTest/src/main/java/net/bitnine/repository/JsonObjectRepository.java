@@ -28,12 +28,12 @@ import net.bitnine.domain.DataMeta;
 import net.bitnine.domain.Edge;
 import net.bitnine.domain.Path;
 import net.bitnine.domain.Vertex;
+import net.bitnine.parser.EdgeParser;
+import net.bitnine.parser.PathParser;
+import net.bitnine.parser.VertexParser;
 import net.bitnine.utils.DomainParser;
-import net.bitnine.utils.EdgeParser;
 import net.bitnine.utils.MetaDataUtils;
-import net.bitnine.utils.PathParser;
 import net.bitnine.utils.TopCommaTokenizer;
-import net.bitnine.utils.VertexParser;
 
 @Repository
 public class JsonObjectRepository {

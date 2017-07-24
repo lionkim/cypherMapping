@@ -1,13 +1,12 @@
 package net.bitnine.utils;
 
 import java.sql.SQLException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.json.simple.parser.ParseException;
 import org.postgresql.util.PGtokenizer;
 
 import net.bitnine.domain.Vertex;
+import net.bitnine.parser.VertexParser;
 
 public class TestVertexParser {
     public static void main(String[] args) throws SQLException, ParseException {

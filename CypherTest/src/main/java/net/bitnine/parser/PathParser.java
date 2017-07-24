@@ -1,4 +1,4 @@
-package net.bitnine.utils;
+package net.bitnine.parser;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -14,27 +14,17 @@ import org.postgresql.util.PSQLState;
 import net.bitnine.domain.Path;
 import net.bitnine.domain.Edge;
 import net.bitnine.domain.Vertex;
+import net.bitnine.utils.DomainParser;
+import net.bitnine.utils.TopCommaTokenizer;
 
 public class PathParser extends DomainParser {
-    public List<Path> createParsedPathList(String result) {
-        String squareRemovedResult = result.substring(1, result.length()-1);      // 결과물 양쪽 끝의 [, ] 를 제거 함.  ex) [distributed[8.965184][5.3494,4.7058]{}] => distributed[8.965184][5.3494,4.7058]{}
-
-        String strPattern = "w*\\[[0-9]*\\.[0-9]*\\]\\[[0-9]*\\.[0-9]*\\,[0-9]*\\.[0-9]*\\]"; // result 를 파싱하기위한 정규식. ex) Edge 'distributed[8.965184][5.3494,4.7058]' 를 검색함.
-
-        Pattern pattern = Pattern.compile(strPattern);
-        
-        int countMatcherNum = getMatchersLength(squareRemovedResult, pattern);                               // 해당 패턴의 시작위치와 끝위치를 저장하는 배열의 크기 계산.
-
-        int[] matcherLocate = createMatcherLocate(squareRemovedResult, pattern, countMatcherNum);      // 패턴에 일치하는 시작위치와 끝위치를 저장하는 배열을 생성. 이 위치를 사용하여 문자열을 짜를것임.
-        return null;
-    }
     
     public Path createParsedPath (String result) throws SQLException, ParseException {
         String type = "path";
         List<Vertex> vertexs = new ArrayList<>();
         List<Edge> edges = new ArrayList<>();
         VertexParser vertexParser = new VertexParser();
-        
+        EdgeParser edgeParser = new EdgeParser();
         
         String p = PGtokenizer.removeBox(result);
         TopCommaTokenizer t;
@@ -46,14 +36,24 @@ public class PathParser extends DomainParser {
                         , new Object[]{type, result})
                     , PSQLState.DATA_TYPE_MISMATCH);
         }
+
+        String source = "";
+        String target = ""; 
+        
         for (int i = 0; i < t.getSize(); ++i) {
             if (i % 2 == 0) {
-                vertexs.add(vertexParser.createParsedVertext(t.getToken(i)));
+                Vertex vertex = vertexParser.createParsedVertext(t.getToken(i));
+                
+                // source Id와 target Id를 설정
+                if (i == 0) source = vertex.getId();
+                if (i == t.getSize() - 1) target = vertex.getId();
+                
+                vertexs.add(vertex);
             }
             else {
-                edges.add(new Edge());
+                edges.add(edgeParser.createParsedEdge(t.getToken(i)));
             }
         }
-        return new Path("", "", vertexs, edges);
+        return new Path(source, target, vertexs, edges);
     }
 }
