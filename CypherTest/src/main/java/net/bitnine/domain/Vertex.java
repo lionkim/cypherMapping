@@ -9,9 +9,11 @@ public class Vertex  {
 	private String name;
 	private JSONObject props;
 
-	public Vertex() {
-	}
-
+    @SuppressWarnings("WeakerAccess")
+    public Vertex() {
+        setType("vertex");
+    }
+    
 	public Vertex(String id, String type, String name, JSONObject props) {
 		this.id = id;
 		this.type = type;

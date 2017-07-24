@@ -19,7 +19,7 @@ public class MetaDataUtils {
         	
         	String columnLabel = data.getColumnLabel(i);
         	String columnTypeName = data.getColumnTypeName(i);
-    		System.out.println("columnTypeName: " + columnTypeName);
+//    		System.out.println("columnTypeName: " + columnTypeName);
     		
         	boolean isReadOnly = data.isReadOnly(i); 
         	

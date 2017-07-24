@@ -48,7 +48,7 @@ public class DataSourceController {
 	public String dbConnect(DataSourceDTO dataSourceDTO, HttpSession session, Model model)  {
 
 		DataSource dataSource = databaseService.createDataSource(dataSourceDTO);
-		System.out.println("dataSource: " + dataSource);
+//		System.out.println("dataSource: " + dataSource);
 		
 		if (dataSource != null) {
 			session.setAttribute(DATASOURCE, dataSource);

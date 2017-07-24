@@ -18,6 +18,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.postgresql.util.PGtokenizer;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -31,6 +32,7 @@ import net.bitnine.utils.DomainParser;
 import net.bitnine.utils.EdgeParser;
 import net.bitnine.utils.MetaDataUtils;
 import net.bitnine.utils.PathParser;
+import net.bitnine.utils.TopCommaTokenizer;
 import net.bitnine.utils.VertexParser;
 
 @Repository
@@ -45,7 +47,7 @@ public class JsonObjectRepository {
 	public JSONObject getJson(String query) throws UnsupportedEncodingException {
 //	    query = "match path=(a:production)-[]-(b:company) where id(a) = '4.7058' return nodes(path) as NODES, edges(path) as EDGES, id( (nodes(path))[1] ) as HEAD, id( (nodes(path))[length(path)+1] ) as TAIL";
 
-	    System.out.println("query: " + query);
+//	    System.out.println("query: " + query);
 	    
 		return jdbcTemplate.query(query, new ResultSetExtractor<JSONObject>() {
 			@Override
@@ -123,17 +125,19 @@ public class JsonObjectRepository {
 			break;
 
 		case "graphpath":
-            List<Path> pathList = pathParser.createParsedPathList(result);
-            rowJsonObject.put(columnName, pathList);
+//            List<Path> pathList = pathParser.createParsedPathList(result);
+		    Path path = pathParser.createParsedPath(result);
+            rowJsonObject.put(columnName, path);
 			break;
 
         case "_vertex":
-            List<Vertex> vertexList = vertexParser.createParsedVertextList(result);
-            rowJsonObject.put(columnName, vertexList);
+        	List<Vertex> vertextList = vertexParser.createParsedVertextList(result);
+            rowJsonObject.put(columnName, vertextList);
             break;
             
         case "_edge":
-            rowJsonObject.put(columnName, edgeParser.createParsedEdge(result));
+//            rowJsonObject.put(columnName, edgeParser.createParsedEdge(result));
+            rowJsonObject.put(columnName, edgeParser.createParsedVertextList(result));
             break;
 
 		/*

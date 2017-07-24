@@ -17,6 +17,8 @@ public class DatabaseService {
 		dataSource.setUrl(dto.getUrl());
 		dataSource.setUsername(dto.getUsername());
 		dataSource.setPassword(dto.getPassword());
+
+        System.out.println("dataSource: " + dataSource);
 		return dataSource;
 	}
 }

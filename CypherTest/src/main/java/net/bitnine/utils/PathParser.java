@@ -1,9 +1,19 @@
 package net.bitnine.utils;
 
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import org.json.simple.parser.ParseException;
+import org.postgresql.util.GT;
+import org.postgresql.util.PGtokenizer;
+import org.postgresql.util.PSQLException;
+import org.postgresql.util.PSQLState;
+
 import net.bitnine.domain.Path;
+import net.bitnine.domain.Edge;
+import net.bitnine.domain.Vertex;
 
 public class PathParser extends DomainParser {
     public List<Path> createParsedPathList(String result) {
@@ -17,5 +27,33 @@ public class PathParser extends DomainParser {
 
         int[] matcherLocate = createMatcherLocate(squareRemovedResult, pattern, countMatcherNum);      // 패턴에 일치하는 시작위치와 끝위치를 저장하는 배열을 생성. 이 위치를 사용하여 문자열을 짜를것임.
         return null;
+    }
+    
+    public Path createParsedPath (String result) throws SQLException, ParseException {
+        String type = "path";
+        List<Vertex> vertexs = new ArrayList<>();
+        List<Edge> edges = new ArrayList<>();
+        VertexParser vertexParser = new VertexParser();
+        
+        
+        String p = PGtokenizer.removeBox(result);
+        TopCommaTokenizer t;
+        try {
+            t = new TopCommaTokenizer(p);
+        }
+        catch (Exception e) {
+            throw new PSQLException(GT.tr("Conversion to type {0} failed: {1}."
+                        , new Object[]{type, result})
+                    , PSQLState.DATA_TYPE_MISMATCH);
+        }
+        for (int i = 0; i < t.getSize(); ++i) {
+            if (i % 2 == 0) {
+                vertexs.add(vertexParser.createParsedVertext(t.getToken(i)));
+            }
+            else {
+                edges.add(new Edge());
+            }
+        }
+        return new Path("", "", vertexs, edges);
     }
 }
