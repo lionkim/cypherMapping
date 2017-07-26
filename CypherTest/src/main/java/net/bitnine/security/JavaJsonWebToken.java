@@ -23,7 +23,7 @@ public class JavaJsonWebToken {
 
          String compactedJWT =  Jwts.builder().setSubject("syle")
                  .setIssuer("localhost")
-     			.signWith(SignatureAlgorithm.HS512, key)
+                 .signWith(SignatureAlgorithm.HS512, key)
 //                 .signWith(SignatureAlgorithm.RS256, key)
                  .compact();
          System.out.println(compactedJWT);
