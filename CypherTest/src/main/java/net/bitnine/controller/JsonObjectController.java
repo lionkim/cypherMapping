@@ -6,6 +6,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,10 +24,10 @@ public class JsonObjectController {
 
 	@Autowired private JsonObjectService service;
 
-	@RequestMapping(value="/api/v1/db/query",method=RequestMethod  .POST)
-	public JSONObject getJson(String query, HttpServletRequest request) throws  IOException {
+	@RequestMapping(value="/api/v1/db/query", method=RequestMethod  .POST)
+	public JSONObject getJson(String query, @RequestHeader(value="Authorization") String Authorization) throws  IOException {
 	    
-		return service.getJson(query, request);
+		return service.getJson(query, Authorization);
 	}
 	
 }

@@ -99,7 +99,7 @@ public class JsonObjectRepository {
 		String columnName = resultSetMetaData.getColumnLabel(cnt);
 		String result = resultSet.getString(columnName);
 		
-		System.out.println("columnTypeName: " + columnTypeName);
+//		System.out.println("columnTypeName: " + columnTypeName);
 
 		switch (columnTypeName) {
 
