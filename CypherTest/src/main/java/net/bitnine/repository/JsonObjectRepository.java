@@ -29,6 +29,7 @@ import net.bitnine.domain.DataMeta;
 import net.bitnine.domain.Edge;
 import net.bitnine.domain.Path;
 import net.bitnine.domain.Vertex;
+import net.bitnine.exception.QueryException;
 import net.bitnine.parser.EdgeParser;
 import net.bitnine.parser.PathParser;
 import net.bitnine.parser.VertexParser;
@@ -73,8 +74,11 @@ public class JsonObjectRepository {
 						try {
 							setChangeType(resultSet, resultSetMetaData, rowJsonObject, count); // 컬럼의 타입별로 해당타입으로 변환하여 jsonObject에 put.
 						} catch (ParseException e) {
-							e.printStackTrace();
-						}
+                            e.printStackTrace();
+                        } catch (SQLException e) {
+                            e.printStackTrace();
+                            throw new QueryException (e.getMessage(), "or SQL_EXCEPTION");
+                        }
 					}
 					nodeJsonArr.add(rowJsonObject);
 				}
