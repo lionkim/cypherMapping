@@ -32,7 +32,7 @@ public class TokenAuthentication {
     public static String generateToken(DataSourceDTO dataSourceDTO) {
         String id = UUID.randomUUID().toString().replace("-", "");
         Date now = new Date();
-        Date exp = new Date(System.currentTimeMillis() + (1000 * 30));
+        Date exp = new Date(System.currentTimeMillis() + (1000 * 60 * 5));
 
         System.out.println("base64SecretByptes: " + base64SecretByptes);
         System.out.println("id: " + id);
@@ -41,9 +41,9 @@ public class TokenAuthentication {
                 .setId(id)
                 .setHeaderParam("alg", "HS256")
                 .setHeaderParam("typ", "JWT")
-//                .setIssuedAt(now)
-//                .setNotBefore(now)
-//                .setExpiration(exp)
+                .setIssuedAt(now)
+                .setNotBefore(now)
+                .setExpiration(exp)
                 .claim("url", dataSourceDTO.getUrl())
                 .claim("username", dataSourceDTO.getUsername())
                 .claim("password", dataSourceDTO.getPassword())

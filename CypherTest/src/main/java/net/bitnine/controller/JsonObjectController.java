@@ -24,7 +24,7 @@ public class JsonObjectController {
 
 	@Autowired private JsonObjectService service;
 
-	@RequestMapping(value="/api/v1/db/query", method=RequestMethod  .POST)
+	@RequestMapping(value="/api/v1/db/query", method=RequestMethod.POST)
 	public JSONObject getJson(String query, @RequestHeader(value="Authorization") String Authorization) throws  IOException {
 	    
 		return service.getJson(query, Authorization);
