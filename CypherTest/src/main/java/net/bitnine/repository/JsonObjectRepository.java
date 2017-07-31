@@ -26,16 +26,13 @@ import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Repository;
 
 import net.bitnine.domain.DataMeta;
-import net.bitnine.domain.Edge;
 import net.bitnine.domain.Path;
 import net.bitnine.domain.Vertex;
 import net.bitnine.exception.QueryException;
 import net.bitnine.parser.EdgeParser;
 import net.bitnine.parser.PathParser;
 import net.bitnine.parser.VertexParser;
-import net.bitnine.utils.DomainParser;
 import net.bitnine.utils.MetaDataUtils;
-import net.bitnine.utils.TopCommaTokenizer;
 
 @Repository
 public class JsonObjectRepository {

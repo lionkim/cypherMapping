@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import io.jsonwebtoken.Claims;
 import net.bitnine.domain.dto.DataSourceDTO;
+import net.bitnine.exception.InvalidTokenException;
 import net.bitnine.jwt.TokenAuthentication;
 import net.bitnine.repository.JsonObjectRepository;
 
@@ -23,13 +24,20 @@ public class JsonObjectService {
     @Autowired private DatabaseService databaseService;
 	JsonObjectRepository repository;
 
-    public JSONObject getJson (String query, String Authorization) throws UnsupportedEncodingException {
-        Claims claims = TokenAuthentication.verifyToken(Authorization);
+    public JSONObject getJson (String query, String Authorization) throws UnsupportedEncodingException, InvalidTokenException {
+        TokenAuthentication tokenAuthentication = new TokenAuthentication();
+        Claims claims = tokenAuthentication.getClaims(Authorization);       // 해당토큰을 가져옴. getClaims()에서 유효성 검사.
+        
         DataSourceDTO dataSourceDTO = new DataSourceDTO();
 
-        dataSourceDTO.setUrl((String) claims.get("url"));
-        dataSourceDTO.setUsername((String) claims.get("username"));
-        dataSourceDTO.setPassword((String) claims.get("password"));
+        if (claims != null) {
+            dataSourceDTO.setUrl((String) claims.get("url"));
+            dataSourceDTO.setUsername((String) claims.get("username"));
+            dataSourceDTO.setPassword((String) claims.get("password"));
+        }
+        else {
+            throw new InvalidTokenException();
+        }
         
         DataSource dataSource = databaseService.createDataSource(dataSourceDTO);
         
@@ -41,21 +49,6 @@ public class JsonObjectService {
         
         return jsonList;
     }
-	
-	/*public JSONObject getJson (String query, HttpServletRequest request) throws UnsupportedEncodingException {
-		HttpSession session = request.getSession();
-		if (session.getAttribute(DATASOURCE) == null) {
-			return null;
-		}
-		DataSource dataSource = (DataSource) session.getAttribute(DATASOURCE);
-		System.out.println("dataSource: " + dataSource);
-		
-		repository = new JsonObjectRepository(dataSource);
-		
-		JSONObject jsonList = repository.getJson(query);
-		
-		return jsonList;
-	}*/
 }
 
 

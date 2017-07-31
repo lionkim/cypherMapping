@@ -1,5 +1,7 @@
 package net.bitnine.controller;
 
+import java.util.Date;
+
 import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 
@@ -11,6 +13,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.jsonwebtoken.Claims;
+import net.bitnine.domain.ConnectInfo;
+import net.bitnine.domain.ConnectInfos;
+import net.bitnine.domain.State;
 import net.bitnine.domain.dto.DataSourceDTO;
 import net.bitnine.jwt.TokenAuthentication;
 import net.bitnine.service.DatabaseService;
@@ -29,6 +34,7 @@ public class DataSourceController {
 	
 	@Autowired private DatabaseService databaseService;
 
+    @Autowired private ConnectInfos connectInfos;
     
     @RequestMapping("/connect")
     public JSONObject connect(DataSourceDTO dataSourceDTO)  {
@@ -46,6 +52,25 @@ public class DataSourceController {
         }
         return jsonObject;
     }
+
+    
+    @RequestMapping("/disconnect")
+    public String disConnect(@RequestHeader(value="Authorization") String Authorization)  {
+        
+        ConnectInfo connectInfo = connectInfos.getConnectInfoList().stream()                        // Convert to steam
+                    .filter(x -> Authorization.equals(x.getToken()))        // we want Authorization only
+                    .findAny()                                      // If 'findAny' then return found
+                    .orElse(null);      
+        
+        if (connectInfo == null) {
+            return "Database DisConnect Failed";            
+        }
+        else {
+            connectInfo.setState(State.INVALID);    // 해당토큰 정보의 상태를 INVALID로 설정.
+        }
+
+        return "Database DisConnect Success";
+    }
 	
 	/*
 	
@@ -61,18 +86,6 @@ public class DataSourceController {
 		}
 		return "Database Connect Failed";
 	}*/
-	
-	@RequestMapping("/disconnect")
-	public String disConnect(@RequestHeader(value="Authorization") String Authorization)  {
-
-        Claims claims = TokenAuthentication.verifyToken(Authorization);
-		/*if (session.getAttribute(DATASOURCE) != null) {
-			session.removeAttribute(DATASOURCE);
-			return "Database DisConnect Success";
-		}*/
-
-		return "Database DisConnect Failed";
-	}
 }
 
 

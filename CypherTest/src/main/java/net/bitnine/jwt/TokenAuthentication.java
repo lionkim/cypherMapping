@@ -4,6 +4,9 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.impl.crypto.MacProvider;
+import net.bitnine.domain.ConnectInfo;
+import net.bitnine.domain.ConnectInfos;
+import net.bitnine.domain.State;
 import net.bitnine.domain.dto.DataSourceDTO;
 
 /*import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -11,6 +14,9 @@ import org.springframework.security.core.Authentication;*/
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
 import java.util.Date;
 import java.util.UUID;
 
@@ -20,11 +26,9 @@ import java.security.Key;
 import java.util.Base64;
 
 public class TokenAuthentication {
-	/*static final long EXPIRATIONTIME = 864_000_000; // 10 days
-	static final String SECRET = "ThisIsASecret";
-	static final String TOKEN_PREFIX = "Bearer";
-	static final String HEADER_STRING = "Authorization";*/
 
+    @Autowired private ConnectInfos connectInfos;
+    
     private static final Key secret = MacProvider.generateKey(SignatureAlgorithm.HS256);
     private static final byte[] secretBytes = secret.getEncoded();
     private static final String base64SecretByptes = Base64.getEncoder().encodeToString(secretBytes);
@@ -52,24 +56,53 @@ public class TokenAuthentication {
         return token;        
     }
     
-    public static Claims verifyToken(String token) {
-        Claims claims = Jwts.parser()
-                .setSigningKey(base64SecretByptes)
-                .parseClaimsJws(token).getBody();
-        
+    /**
+     * Authorization에 해당하는 Claims을 리턴.
+     * @param Authorization
+     * @return
+     */
+    public Claims getClaims (String Authorization) {
 
-        System.out.println("----------------------------");
-        System.out.println("ID: " + claims.getId());
-        System.out.println("Subject: " + claims.getSubject());
-        System.out.println("Issuer: " + claims.getIssuer());
-        System.out.println("Expiration: " + claims.getExpiration());
-        System.out.println("url: " + (String) claims.get("url"));
-        System.out.println("username: " + (String) claims.get("username"));
-        System.out.println("password: " + (String) claims.get("password"));
-          
+        Claims claims = null;
+        ConnectInfo connectInfo;
+        
+        try {
+            connectInfo = verifyToken(Authorization); 
+            
+            if (connectInfo == null) {
+                return claims;          
+            }
+            else {
+                claims = Jwts.parser()
+                        .setSigningKey(base64SecretByptes)
+                        .parseClaimsJws(Authorization).getBody();
+            }
+        }
+        catch (Exception e) {
+            return claims;          
+        }
         return claims;
     }
+
+    /**
+     * connectInfos의 connectInfoList에서 Authorization에 해당하는 ConnectInfo를 찾아서 상태를 확인하여 
+     * 상태가 VALID일 경우 해당하는 ConnectInfo를 반환.
+     * 상태가 INVALID 이거나  해당하는 ConnectInfo가 없으면 null을 반환
+     */
+    private ConnectInfo verifyToken(String Authorization) {
+        ConnectInfo connectInfo;
+        connectInfo = connectInfos.getConnectInfoList().stream()                        // Convert to steam
+                .filter(x -> Authorization.equals(x.getToken()))        // we want Authorization only
+                .findAny()                                      // If 'findAny' then return found
+                .orElse(null);
+        
+        if ( (connectInfo == null) || ((connectInfo != null) && (connectInfo.getState() == State.INVALID)) ) {
+            return null;
+        }
+        return connectInfo;
+    }
     
+
 	/*static void addAuthentication(HttpServletResponse res, String username) {
 		String JWT = Jwts.builder().setSubject(username)
 				.setExpiration(new Date(System.currentTimeMillis() + EXPIRATIONTIME))

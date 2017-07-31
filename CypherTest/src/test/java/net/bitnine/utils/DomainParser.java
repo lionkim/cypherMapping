@@ -14,11 +14,6 @@ import net.bitnine.domain.Path;
 import net.bitnine.domain.Vertex;
 
 public class DomainParser {
-
-
-   
-    
-   
     
     /**
      * vertex들과 props들을 담을 배열 생성
