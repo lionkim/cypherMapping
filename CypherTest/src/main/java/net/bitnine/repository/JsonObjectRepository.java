@@ -53,13 +53,10 @@ public class JsonObjectRepository {
 	}
 	
 	public JSONObject getJson(String query) throws QueryException {
-        Connection conn = null;
         PgConnection pgConnection  = null;
-        PreparedStatement pstmt = null;
-        Statement statement = null;
-        ResultSet resultSet = null;
         PgResultSet pgResultSet = null;
         PgStatement pgstmt = null;
+        
         JSONObject mapRet = new JSONObject();
         
 	    try {
@@ -116,9 +113,9 @@ public class JsonObjectRepository {
             throw new QueryException (e.getMessage(), "or SQL_EXCEPTION");
             
         } finally {
-            if (conn != null) try { conn.close(); } catch (SQLException e) {}
-            if (resultSet != null) try { resultSet.close(); } catch (SQLException e) {}
-            if (pstmt != null) try { pstmt.close(); } catch (SQLException e) {}
+            if (pgConnection != null) try { pgConnection.close(); } catch (SQLException e) {}
+            if (pgResultSet != null) try { pgResultSet.close(); } catch (SQLException e) {}
+            if (pgstmt != null) try { pgstmt.close(); } catch (SQLException e) {}
 	    }
         return mapRet;
 	}
@@ -173,18 +170,15 @@ public class JsonObjectRepository {
 	    
 		JSONParser parser = new JSONParser();
 		String columnTypeName = resultSetMetaData.getColumnTypeName(cnt);
-
-//		String columnName = resultSetMetaData.getColumnLabel(cnt).toUpperCase();
 		String columnName = resultSetMetaData.getColumnLabel(cnt);
 		
-//		System.out.println("columnTypeName: " + columnTypeName);
+		System.out.println("columnTypeName: " + columnTypeName);
 
 		switch (columnTypeName) {
 
 		// number에는 int, long, double, float 등
 		case "number":
 		    int result = pgResultSet.getInt(columnName);
-		    System.out.println("number: " + result);
 			rowJsonObject.put(columnName, result);
 			break;
 
@@ -261,29 +255,6 @@ public class JsonObjectRepository {
             Object objectResult = pgResultSet.getObject(columnName);
 			rowJsonObject.put(columnName, objectResult);
 			break;
-		}
-	}
-	
-
-	public void getJsonData(String node) throws ParseException {
-		JSONParser parser = new JSONParser();
-		JSONObject jsonObject = null;
-		
-        jsonObject = (JSONObject) parser.parse(node);              
-        
-		List<String> arrNames = new ArrayList<>();
-		
-		Iterator<String> it = jsonObject.keySet().iterator();
-
-		
-		Map<String, Object> map = new HashMap<>();
-		
-		int i = 0;
-		while (it.hasNext()) {
-			String key = it.next();
-			Object value = jsonObject.get(key);
-			map.put(key, value);
-			i++;
 		}
 	}
 

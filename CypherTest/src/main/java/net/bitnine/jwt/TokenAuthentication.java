@@ -8,6 +8,7 @@ import net.bitnine.domain.ConnectInfo;
 import net.bitnine.domain.ConnectInfos;
 import net.bitnine.domain.State;
 import net.bitnine.domain.dto.DataSourceDTO;
+import net.bitnine.service.PropertiesService;
 
 /*import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;*/
@@ -16,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -30,18 +32,30 @@ import java.util.Base64;
 public class TokenAuthentication {
 
     @Autowired private ConnectInfos connectInfos;
+    @Autowired private PropertiesService propertiesService;
+    
     
     private final Key secret = MacProvider.generateKey(SignatureAlgorithm.HS256);
     private final byte[] secretBytes = secret.getEncoded();
     private final String base64SecretByptes = Base64.getEncoder().encodeToString(secretBytes);
     
+    /*@Value("${setMax}")    
+    private String setMax;  */    // application.properties 파일. setMax 값을 가져옴
+    
+    
     public String generateToken(DataSourceDTO dataSourceDTO) {
+        String setMax = propertiesService.getSetMax();
+        
         String id = UUID.randomUUID().toString().replace("-", "");
         Date now = new Date();
-        Date exp = new Date(System.currentTimeMillis() + (1000 * 60 * 5));
+        int temp = (1000 * Integer.parseInt(setMax));
 
-        System.out.println("base64SecretByptes: " + base64SecretByptes);
-        System.out.println("id: " + id);
+        System.out.println("temp: " + temp);
+        
+        Date exp = new Date(System.currentTimeMillis() + temp);
+
+       /* System.out.println("base64SecretByptes: " + base64SecretByptes);
+        System.out.println("id: " + id);*/
        
         String token = Jwts.builder()
                 .setId(id)
