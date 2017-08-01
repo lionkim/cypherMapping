@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.Date;
 import java.util.UUID;
@@ -25,15 +26,16 @@ import static java.util.Collections.emptyList;
 import java.security.Key;
 import java.util.Base64;
 
+@Component
 public class TokenAuthentication {
 
     @Autowired private ConnectInfos connectInfos;
     
-    private static final Key secret = MacProvider.generateKey(SignatureAlgorithm.HS256);
-    private static final byte[] secretBytes = secret.getEncoded();
-    private static final String base64SecretByptes = Base64.getEncoder().encodeToString(secretBytes);
+    private final Key secret = MacProvider.generateKey(SignatureAlgorithm.HS256);
+    private final byte[] secretBytes = secret.getEncoded();
+    private final String base64SecretByptes = Base64.getEncoder().encodeToString(secretBytes);
     
-    public static String generateToken(DataSourceDTO dataSourceDTO) {
+    public String generateToken(DataSourceDTO dataSourceDTO) {
         String id = UUID.randomUUID().toString().replace("-", "");
         Date now = new Date();
         Date exp = new Date(System.currentTimeMillis() + (1000 * 60 * 5));

@@ -35,6 +35,7 @@ public class DataSourceController {
 	@Autowired private DatabaseService databaseService;
 
     @Autowired private ConnectInfos connectInfos;
+    @Autowired private TokenAuthentication tokenAuthentication;
     
     @RequestMapping("/connect")
     public JSONObject connect(DataSourceDTO dataSourceDTO)  {
@@ -43,7 +44,7 @@ public class DataSourceController {
 //      System.out.println("dataSource: " + dataSource);
         
         if (dataSource != null) {
-            jsonObject.put("token", TokenAuthentication.generateToken(dataSourceDTO));
+            jsonObject.put("token", tokenAuthentication.generateToken(dataSourceDTO));
             
             jsonObject.put("message", "Database Connect Success");
         }
@@ -55,12 +56,18 @@ public class DataSourceController {
 
     
     @RequestMapping("/disconnect")
-    public String disConnect(@RequestHeader(value="Authorization") String Authorization)  {
+    public String disConnect(@RequestHeader(value="Authorization") String authorization)  {
         
-        ConnectInfo connectInfo = connectInfos.getConnectInfoList().stream()                        // Convert to steam
+        /*ConnectInfo connectInfo = connectInfos.getConnectInfoList().stream()                        // Convert to steam
                     .filter(x -> Authorization.equals(x.getToken()))        // we want Authorization only
                     .findAny()                                      // If 'findAny' then return found
-                    .orElse(null);      
+                    .orElse(null);  */ 
+        ConnectInfo connectInfo = null;
+        for (ConnectInfo connInfo : connectInfos.getConnectInfoList()) {
+            if ( authorization.equals(connInfo.getToken()) ) {
+                connectInfo = connInfo;
+            }
+        }
         
         if (connectInfo == null) {
             return "Database DisConnect Failed";            

@@ -55,7 +55,7 @@ public class EdgeParser {
             target = m.group(6) + "." + m.group(7);
             String properties = m.group(8);
             if (properties == null)
-                props = null;
+                props = new JSONObject();
             else
                 props = (JSONObject) parser.parse(properties);
         }

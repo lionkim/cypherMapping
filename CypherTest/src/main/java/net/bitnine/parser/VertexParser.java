@@ -60,7 +60,7 @@ public class VertexParser {
             id = m.group(2) + "." + m.group(3);
             String property = m.group(4);
             if (property == null)
-                props = null;   // DEFAULT: {}
+                props = new JSONObject();   // DEFAULT: {}
             else
                 props = (JSONObject) parser.parse(property);
         } else {

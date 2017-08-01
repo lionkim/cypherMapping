@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import net.bitnine.exception.InvalidTokenException;
+import net.bitnine.exception.QueryException;
 import net.bitnine.service.JsonObjectService;
 
 /**
@@ -26,7 +27,7 @@ public class JsonObjectController {
 	@Autowired private JsonObjectService service;
 
 	@RequestMapping(value="/api/v1/db/query", method=RequestMethod.POST)
-	public JSONObject getJson(String query, @RequestHeader(value="Authorization") String Authorization) throws  IOException, InvalidTokenException {
+	public JSONObject getJson(String query, @RequestHeader(value="Authorization") String Authorization) throws  IOException, InvalidTokenException, QueryException {
 	    
 		return service.getJson(query, Authorization);
 	}

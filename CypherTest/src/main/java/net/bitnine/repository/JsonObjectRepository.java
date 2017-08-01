@@ -2,9 +2,12 @@ package net.bitnine.repository;
 
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -19,6 +22,9 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.postgresql.jdbc.PgStatement;
+import org.postgresql.jdbc.PgConnection;
+import org.postgresql.jdbc.PgResultSet;
 import org.postgresql.util.PGtokenizer;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -38,15 +44,87 @@ import net.bitnine.utils.MetaDataUtils;
 public class JsonObjectRepository {
 
 	private JdbcTemplate jdbcTemplate;
+	
+	private DataSource dataSource;
 
 	public JsonObjectRepository(DataSource dataSource) {
-		jdbcTemplate = new JdbcTemplate(dataSource);
+//        jdbcTemplate = new JdbcTemplate(dataSource);
+        this.dataSource = dataSource;
 	}
+	
+	public JSONObject getJson(String query) throws QueryException {
+        Connection conn = null;
+        PgConnection pgConnection  = null;
+        PreparedStatement pstmt = null;
+        Statement statement = null;
+        ResultSet resultSet = null;
+        PgResultSet pgResultSet = null;
+        PgStatement pgstmt = null;
+        JSONObject mapRet = new JSONObject();
+        
+	    try {
+            if (dataSource.getConnection().isWrapperFor(PgConnection.class)) {
+                pgConnection = dataSource.getConnection().unwrap(PgConnection.class);
+            }
+	        
+	        // use connection
+	        // cast to the pg extension interface
+//	        pgstmt =  (PgStatement) pgConnection.prepareStatement(query);
+	        
+	        pgstmt =  (PgStatement) pgConnection.createStatement();
 
-	public JSONObject getJson(String query) throws UnsupportedEncodingException {
-//	    query = "match path=(a:production)-[]-(b:company) where id(a) = '4.7058' return nodes(path) as NODES, edges(path) as EDGES, id( (nodes(path))[1] ) as HEAD, id( (nodes(path))[length(path)+1] ) as TAIL";
+	        pgResultSet = (PgResultSet) pgstmt.executeQuery(query);
 
-//	    System.out.println("query: " + query);
+
+//            pstmt =  conn.prepareStatement(query);
+            
+            ResultSetMetaData resultSetMetaData = pgResultSet.getMetaData();
+
+            List<DataMeta> dataMetaList = MetaDataUtils.getMetaDataList(resultSetMetaData);
+	        
+	        
+	       /* pstmt = conn.prepareStatement(query);
+	        
+            resultSet = pstmt.executeQuery();
+
+            ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
+
+            List<DataMeta> dataMetaList = MetaDataUtils.getMetaDataList(resultSetMetaData);*/
+
+            mapRet.put("meta", dataMetaList);
+
+            JSONArray nodeJsonArr = new JSONArray(); // 파싱된 값 전체를 담을 배열
+
+//            while (resultSet.next()) {
+            while (pgResultSet.next()) {
+                // ResultSet의 결과를 LinkedHashMap에 저장 - put 순서대로 꺼내기 위해
+                JSONObject rowJsonObject = new JSONObject();
+
+                for (int count = 1; count <= resultSetMetaData.getColumnCount(); count++) { // i가 1부터 시작함에 유의
+                    setChangeType(pgResultSet, resultSetMetaData, rowJsonObject, count); // 컬럼의 타입별로 해당타입으로 변환하여 jsonObject에 put.                    
+                }
+                nodeJsonArr.add(rowJsonObject);
+	        }
+
+            mapRet.put("rows", nodeJsonArr);
+
+	    } catch (ParseException e) {
+            e.printStackTrace();
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new QueryException (e.getMessage(), "or SQL_EXCEPTION");
+            
+        } finally {
+            if (conn != null) try { conn.close(); } catch (SQLException e) {}
+            if (resultSet != null) try { resultSet.close(); } catch (SQLException e) {}
+            if (pstmt != null) try { pstmt.close(); } catch (SQLException e) {}
+	    }
+        return mapRet;
+	}
+	
+
+	/*public JSONObject getJson(String query) throws UnsupportedEncodingException {
 	    
 		return jdbcTemplate.query(query, new ResultSetExtractor<JSONObject>() {
 			@Override
@@ -85,9 +163,9 @@ public class JsonObjectRepository {
 				return mapRet;
 			}
 		});
-	}
+	}*/
 
-	private void setChangeType(ResultSet resultSet, ResultSetMetaData resultSetMetaData, JSONObject rowJsonObject,
+	private void setChangeType(PgResultSet pgResultSet, ResultSetMetaData resultSetMetaData, JSONObject rowJsonObject,
 			int cnt) throws ParseException, SQLException {
 	    PathParser pathParser = new PathParser();
 	    EdgeParser edgeParser = new EdgeParser();
@@ -98,7 +176,6 @@ public class JsonObjectRepository {
 
 //		String columnName = resultSetMetaData.getColumnLabel(cnt).toUpperCase();
 		String columnName = resultSetMetaData.getColumnLabel(cnt);
-		String result = resultSet.getString(columnName);
 		
 //		System.out.println("columnTypeName: " + columnTypeName);
 
@@ -106,74 +183,83 @@ public class JsonObjectRepository {
 
 		// number에는 int, long, double, float 등
 		case "number":
-			long longResult = Long.parseLong(result);
-			rowJsonObject.put(columnName, longResult);
+		    int result = pgResultSet.getInt(columnName);
+		    System.out.println("number: " + result);
+			rowJsonObject.put(columnName, result);
 			break;
 
         case "int4":
-            Integer integer4Result = Integer.parseInt(result);
-            System.out.println("int4\n");
-            rowJsonObject.put(columnName, integer4Result);
+            int int4Result = pgResultSet.getInt(columnName);
+            rowJsonObject.put(columnName, int4Result);
             break;
 
         case "int8":
-            long int8Result = Long.parseLong(result);
+            int int8Result = pgResultSet.getInt(columnName);
             rowJsonObject.put(columnName, int8Result);
             break;
             
         case "decimal":
-            BigDecimal decimalResult = new BigDecimal(result);
+            Double decimalResult = pgResultSet.getDouble(columnName);
             rowJsonObject.put(columnName, decimalResult);
             break;
             
         case "numeric":
-            BigDecimal numericResult = new BigDecimal(result);
+            Double numericResult = pgResultSet.getDouble(columnName);
             rowJsonObject.put(columnName, numericResult);
             break;
             
 		case "varchar":
-			rowJsonObject.put(columnName, result);
+            String varcharResult = pgResultSet.getString(columnName);
+			rowJsonObject.put(columnName, varcharResult);
 			break;
 
 		case "graphid":
-			Double doubleResult = resultSet.getDouble(columnName);
+		    Double doubleResult = pgResultSet.getDouble(columnName);
 
 			rowJsonObject.put(columnName, doubleResult);
 			break;
 
 		case "text":
-			rowJsonObject.put(columnName, result);
+            String textResult = pgResultSet.getString(columnName);
+			rowJsonObject.put(columnName, textResult);
 			break;
 
 		case "jsonb":
-			rowJsonObject.put(columnName, (JSONObject) parser.parse(result));
+            String jsonbResult = pgResultSet.getString(columnName);
+			rowJsonObject.put(columnName, (JSONObject) parser.parse(jsonbResult));
 			break;
 
 		case "graphpath":
-		    Path path = pathParser.createParsedPath(result);
+            String graphpathResult = pgResultSet.getString(columnName);
+		    Path path = pathParser.createParsedPath(graphpathResult);
             rowJsonObject.put(columnName, path);
 			break;
 
         case "vertex":
-            Vertex vertext = vertexParser.createParsedVertext(result);
+            String vertexResult = pgResultSet.getString(columnName);
+            Vertex vertext = vertexParser.createParsedVertext(vertexResult);
             rowJsonObject.put(columnName, vertext);
             break;
             
         case "edge":
-            rowJsonObject.put(columnName, edgeParser.createParsedEdge(result));
+            String edgeResult = pgResultSet.getString(columnName);
+            rowJsonObject.put(columnName, edgeParser.createParsedEdge(edgeResult));
             break;
 
         case "_vertex":
-            List<Vertex> vertextList = vertexParser.createParsedVertextList(result);
+            String vertexListResult = pgResultSet.getString(columnName);
+            List<Vertex> vertextList = vertexParser.createParsedVertextList(vertexListResult);
             rowJsonObject.put(columnName, vertextList);
             break;
             
         case "_edge":
-            rowJsonObject.put(columnName, edgeParser.createParsedVertextList(result));
+            String edgeListResult = pgResultSet.getString(columnName);
+            rowJsonObject.put(columnName, edgeParser.createParsedVertextList(edgeListResult));
             break;
 
 		default:
-			rowJsonObject.put(columnName, result);
+            Object objectResult = pgResultSet.getObject(columnName);
+			rowJsonObject.put(columnName, objectResult);
 			break;
 		}
 	}

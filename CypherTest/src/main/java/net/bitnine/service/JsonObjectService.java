@@ -14,18 +14,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import io.jsonwebtoken.Claims;
+import net.bitnine.domain.ConnectInfos;
 import net.bitnine.domain.dto.DataSourceDTO;
 import net.bitnine.exception.InvalidTokenException;
+import net.bitnine.exception.QueryException;
 import net.bitnine.jwt.TokenAuthentication;
 import net.bitnine.repository.JsonObjectRepository;
 
 @Service
 public class JsonObjectService {
     @Autowired private DatabaseService databaseService;
+    @Autowired private TokenAuthentication tokenAuthentication;
 	JsonObjectRepository repository;
 
-    public JSONObject getJson (String query, String Authorization) throws UnsupportedEncodingException, InvalidTokenException {
-        TokenAuthentication tokenAuthentication = new TokenAuthentication();
+    public JSONObject getJson (String query, String Authorization) throws UnsupportedEncodingException, InvalidTokenException, QueryException {
+//        TokenAuthentication tokenAuthentication = new TokenAuthentication();
         Claims claims = tokenAuthentication.getClaims(Authorization);       // 해당토큰을 가져옴. getClaims()에서 유효성 검사.
         
         DataSourceDTO dataSourceDTO = new DataSourceDTO();
