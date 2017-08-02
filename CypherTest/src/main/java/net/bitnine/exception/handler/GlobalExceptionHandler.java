@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.WebRequest;
 
+import net.bitnine.exception.InValidDataSourceException;
 import net.bitnine.exception.InvalidTokenException;
 import net.bitnine.exception.QueryException;
 import net.bitnine.exception.test.BaseException;
@@ -30,6 +31,16 @@ public class GlobalExceptionHandler {
     }
     
 
+
+
+    @ExceptionHandler(value = { InValidDataSourceException.class })
+    @ResponseBody
+    protected ErrorMessage handleInValidDataSourceException(SQLException ex, InValidDataSourceException inValidDataSourceException, WebRequest request) {
+        ErrorMessage em = new ErrorMessage();
+        em.setStatus (inValidDataSourceException.getErrorCode());
+        em.setMessage(inValidDataSourceException.getMessage());
+        return em;
+    }
    
     
     @ExceptionHandler(value = { InvalidTokenException.class })
@@ -70,23 +81,33 @@ public class GlobalExceptionHandler {
 
 
 class ErrorMessage {
-    private String status;
+	private String status;
+    private String errorCode;
     private String message;
+    
+	public ErrorMessage() {
+		this.status = "failure";		// 기본값으로 failure
+	}
+	
+	public String getStatus() {
+		return status;
+	}
+	public void setStatus(String status) {
+		this.status = status;
+	}
+	public String getErrorCode() {
+		return errorCode;
+	}
+	public void setErrorCode(String errorCode) {
+		this.errorCode = errorCode;
+	}
+	public String getMessage() {
+		return message;
+	}
+	public void setMessage(String message) {
+		this.message = message;
+	}
 
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
+    
 
 }

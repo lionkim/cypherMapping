@@ -25,6 +25,7 @@ import org.json.simple.parser.ParseException;
 import org.postgresql.jdbc.PgStatement;
 import org.postgresql.jdbc.PgConnection;
 import org.postgresql.jdbc.PgResultSet;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import net.bitnine.domain.DataMeta;
@@ -34,24 +35,35 @@ import net.bitnine.exception.QueryException;
 import net.bitnine.parser.EdgeParser;
 import net.bitnine.parser.PathParser;
 import net.bitnine.parser.VertexParser;
+import net.bitnine.service.PropertiesService;
 import net.bitnine.util.JDBCTutorialUtilities;
 import net.bitnine.util.MetaDataUtils;
 
 @Repository
 public class JsonObjectRepository {
-	
-	private DataSource dataSource;
 
-	public JsonObjectRepository(DataSource dataSource) {
-        this.dataSource = dataSource;
-	}
+    @Autowired private PropertiesService propertiesService;
+    
+	private DataSource dataSource;
 	
+	public DataSource getDataSource() {
+		return dataSource;
+	}
+	public void setDataSource(DataSource dataSource) {
+		this.dataSource = dataSource;
+	}
+
+
 	public JSONObject getJson(String query) throws QueryException {
         PgConnection pgConnection  = null;
         PgResultSet pgResultSet = null;
         PgStatement pgstmt = null;
         
         JSONObject mapRet = new JSONObject();
+
+        String maxRow = propertiesService.getSetMax();
+        
+        int maxRows = Integer.parseInt(maxRow);
         
 	    try {
             if (dataSource.getConnection().isWrapperFor(PgConnection.class)) {
@@ -59,6 +71,8 @@ public class JsonObjectRepository {
             }
 	        
 	        pgstmt =  (PgStatement) pgConnection.createStatement();
+	        
+	        pgstmt.setMaxRows(maxRows);			// 반환하는 row 수를 maxRows 값으로 설정함. maxRows값은 application.properties의 setMax 값. 관리자가 런타임 수정가능
 
 	        pgResultSet = (PgResultSet) pgstmt.executeQuery(query);
             
@@ -66,7 +80,6 @@ public class JsonObjectRepository {
 
             List<DataMeta> dataMetaList = MetaDataUtils.getMetaDataList(resultSetMetaData);
 
-            mapRet.put("meta", dataMetaList);
 
             JSONArray nodeJsonArr = new JSONArray(); // 파싱된 값 전체를 담을 배열
 
@@ -80,6 +93,8 @@ public class JsonObjectRepository {
                 nodeJsonArr.add(rowJsonObject);
 	        }
 
+            mapRet.put("meta", "success");
+            mapRet.put("meta", dataMetaList);
             mapRet.put("rows", nodeJsonArr);
 
 	    } catch (ParseException ex) {

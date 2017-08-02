@@ -1,11 +1,13 @@
 package net.bitnine.controller;
 
+import java.sql.SQLException;
 import java.util.Date;
 
 import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 
 import org.json.simple.JSONObject;
+import org.postgresql.jdbc.PgConnection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -17,8 +19,11 @@ import net.bitnine.domain.ConnectInfo;
 import net.bitnine.domain.ConnectInfos;
 import net.bitnine.domain.State;
 import net.bitnine.domain.dto.DataSourceDTO;
+import net.bitnine.exception.InvalidTokenException;
+import net.bitnine.exception.QueryException;
 import net.bitnine.jwt.TokenAuthentication;
 import net.bitnine.service.DatabaseService;
+import net.bitnine.util.JDBCTutorialUtilities;
 
 /**
  * 사용자가 전송한 정보로 dataSource를 만드는 컨트롤러
@@ -38,10 +43,21 @@ public class DataSourceController {
     @Autowired private TokenAuthentication tokenAuthentication;
     
     @RequestMapping("/connect")
-    public JSONObject connect(DataSourceDTO dataSourceDTO)  {
+    public JSONObject connect(DataSourceDTO dataSourceDTO) throws QueryException {
         JSONObject jsonObject = new JSONObject();
         DataSource dataSource = databaseService.createDataSource(dataSourceDTO);
 //      System.out.println("dataSource: " + dataSource);
+        
+
+        try {
+			if (!dataSource.getConnection().isWrapperFor(PgConnection.class)) {
+			    throw new InvalidTokenException();        	
+			}
+		} catch (SQLException ex) {
+            JDBCTutorialUtilities.printSQLException(ex);
+            ex.printStackTrace();
+            throw new QueryException (JDBCTutorialUtilities.getSQLState(ex), ex);            
+		}
         
         if (dataSource != null) {
             jsonObject.put("token", tokenAuthentication.generateToken(dataSourceDTO));

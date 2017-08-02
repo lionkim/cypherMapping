@@ -8,6 +8,8 @@ import net.bitnine.domain.ConnectInfo;
 import net.bitnine.domain.ConnectInfos;
 import net.bitnine.domain.State;
 import net.bitnine.domain.dto.DataSourceDTO;
+import net.bitnine.exception.InValidDataSourceException;
+import net.bitnine.service.DatabaseService;
 import net.bitnine.service.PropertiesService;
 
 /*import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -16,6 +18,7 @@ import org.springframework.security.core.Authentication;*/
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.postgresql.jdbc.PgConnection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -30,25 +33,26 @@ import java.util.Base64;
 
 @Component
 public class TokenAuthentication {
-
+    
+	@Autowired private DatabaseService databaseService;
+	
     @Autowired private ConnectInfos connectInfos;
-    @Autowired private PropertiesService propertiesService;
-    
-    
+        
     private final Key secret = MacProvider.generateKey(SignatureAlgorithm.HS256);
     private final byte[] secretBytes = secret.getEncoded();
-    private final String base64SecretByptes = Base64.getEncoder().encodeToString(secretBytes);
-    
-    /*@Value("${setMax}")    
-    private String setMax;  */    // application.properties 파일. setMax 값을 가져옴
+    private final String base64SecretByptes = Base64.getEncoder().encodeToString(secretBytes);    
     
     
-    public String generateToken(DataSourceDTO dataSourceDTO) {
-        String setMax = propertiesService.getSetMax();
-        
-        String id = UUID.randomUUID().toString().replace("-", "");
+    public String generateToken(DataSourceDTO dataSourceDTO) {   
+    	
+    	
+    	//if (databaseService.createDataSource(dataSourceDTO) == null) throw new InValidDataSourceException();
+
+    	
+    	String id = UUID.randomUUID().toString().replace("-", "");
         Date now = new Date();
-        int temp = (1000 * Integer.parseInt(setMax));
+//        int temp = (1000 * Integer.parseInt(setMax));
+        int temp = (1000 * 60 * 60);
 
         System.out.println("temp: " + temp);
         
@@ -57,13 +61,17 @@ public class TokenAuthentication {
        /* System.out.println("base64SecretByptes: " + base64SecretByptes);
         System.out.println("id: " + id);*/
        
+
+        
+        
+        // JJWT 를 사용하여 token 생성
         String token = Jwts.builder()
                 .setId(id)
-                .setHeaderParam("alg", "HS256")
-                .setHeaderParam("typ", "JWT")
+                .setHeaderParam("alg", "HS256")				// token algorithm
+                .setHeaderParam("typ", "JWT")				// token type
                 .setIssuedAt(now)
                 .setNotBefore(now)
-                .setExpiration(exp)
+                .setExpiration(exp)								// expired time
                 .claim("url", dataSourceDTO.getUrl())
                 .claim("username", dataSourceDTO.getUsername())
                 .claim("password", dataSourceDTO.getPassword())

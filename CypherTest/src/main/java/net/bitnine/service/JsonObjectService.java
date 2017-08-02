@@ -25,7 +25,7 @@ import net.bitnine.repository.JsonObjectRepository;
 public class JsonObjectService {
     @Autowired private DatabaseService databaseService;
     @Autowired private TokenAuthentication tokenAuthentication;
-	JsonObjectRepository repository;
+    @Autowired private JsonObjectRepository repository;
 
     public JSONObject getJson (String query, String Authorization) throws UnsupportedEncodingException, InvalidTokenException, QueryException {
 //        TokenAuthentication tokenAuthentication = new TokenAuthentication();
@@ -46,7 +46,7 @@ public class JsonObjectService {
         
         System.out.println("dataSource: " + dataSource);
         
-        repository = new JsonObjectRepository(dataSource);
+        repository.setDataSource(dataSource);
         
         JSONObject jsonList = repository.getJson(query);
         
