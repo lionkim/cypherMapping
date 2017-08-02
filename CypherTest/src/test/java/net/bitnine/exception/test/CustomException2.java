@@ -1,4 +1,4 @@
-package net.bitnine.exception;
+package net.bitnine.exception.test;
 
 import net.bitnine.util.messages.ErrorCodes;
 

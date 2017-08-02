@@ -11,11 +11,6 @@ import org.springframework.web.bind.annotation.RestController;
 @EnableAutoConfiguration
 public class CypherTestApplication {
 
-    @RequestMapping("/")
-    String hello() {
-        return "hello world";
-    }
-
 	public static void main(String[] args) {
 		SpringApplication.run(CypherTestApplication.class, args);
 	}

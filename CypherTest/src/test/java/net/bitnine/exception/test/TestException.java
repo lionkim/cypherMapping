@@ -1,4 +1,4 @@
-package net.bitnine.exception;
+package net.bitnine.exception.test;
 
 public class TestException extends RuntimeException {
 
@@ -6,6 +6,7 @@ public class TestException extends RuntimeException {
     private String message;
     
     public TestException(String message) {
+        super(message);
         this.message = message;
     }
     

@@ -1,13 +1,20 @@
 package net.bitnine.exception;
 
-import java.sql.SQLException;
+public class QueryException extends RuntimeException {
 
-public class QueryException extends SQLException {
+    private static final long serialVersionUID = 1L;
+    private String message;
+    
     public QueryException() { }
     public QueryException(String message) {
         super (message);
+        this.message = message;
     }
-    public QueryException(String message, String string) {
-        super (message, string);
+    
+    public String getMessage() {
+        return message;
+    }
+    public void setMessage(String message) {
+        this.message = message;
     }
 }

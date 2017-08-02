@@ -1,8 +1,11 @@
-package net.bitnine.exception;
+package net.bitnine.exception.test;
 
-import net.bitnine.exception.BaseException;
-import net.bitnine.exception.CustomException1;
-import net.bitnine.exception.CustomException2;
+import net.bitnine.exception.QueryException;
+import net.bitnine.exception.test.BaseException;
+import net.bitnine.exception.test.CustomException1;
+import net.bitnine.exception.test.CustomException2;
+import net.bitnine.util.messages.ErrorCodes;
+
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -12,8 +15,23 @@ import org.springframework.web.bind.annotation.RestController;
  * @since 19/2/16
  */
 @RestController
-@RequestMapping({ "", "/" })
+@RequestMapping({"/exception" })
 public class HomeController {
+
+    @RequestMapping(value="/query")
+    public void ExecuteQueryException(){
+        throw new QueryException(ErrorCodes.QUERY_EXCEPTION);
+    }
+
+    @RequestMapping(value="/sql")
+    public void ExecuteSQLException(){
+        throw new TestException(ErrorCodes.CUSTOM_EXCEPTION_1);
+    }
+
+    @RequestMapping(value="/test")
+    public void ExecuteException(){
+        throw new TestException(ErrorCodes.CUSTOM_EXCEPTION_1);
+    }
 
     @RequestMapping("/ex1")
     public String ex1() {
