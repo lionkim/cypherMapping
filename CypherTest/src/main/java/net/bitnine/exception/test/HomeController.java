@@ -1,5 +1,6 @@
 package net.bitnine.exception.test;
 
+import net.bitnine.exception.InvalidTokenException;
 import net.bitnine.exception.QueryException;
 import net.bitnine.exception.test.BaseException;
 import net.bitnine.exception.test.CustomException1;
@@ -19,8 +20,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class HomeController {
 
     @RequestMapping(value="/query")
-    public void ExecuteQueryException(){
-        throw new QueryException(ErrorCodes.QUERY_EXCEPTION);
+    public void ExecuteQueryException() throws QueryException{
+//        throw new QueryException(ErrorCodes.QUERY_EXCEPTION);
+        throw new QueryException();
+    }
+
+    @RequestMapping(value="/token")
+    public void ExecuteInvalidTokenException(){
+        throw new InvalidTokenException();
     }
 
     @RequestMapping(value="/sql")

@@ -25,10 +25,6 @@ import org.json.simple.parser.ParseException;
 import org.postgresql.jdbc.PgStatement;
 import org.postgresql.jdbc.PgConnection;
 import org.postgresql.jdbc.PgResultSet;
-import org.postgresql.util.PGtokenizer;
-import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.stereotype.Repository;
 
 import net.bitnine.domain.DataMeta;
@@ -38,17 +34,15 @@ import net.bitnine.exception.QueryException;
 import net.bitnine.parser.EdgeParser;
 import net.bitnine.parser.PathParser;
 import net.bitnine.parser.VertexParser;
+import net.bitnine.util.JDBCTutorialUtilities;
 import net.bitnine.util.MetaDataUtils;
 
 @Repository
 public class JsonObjectRepository {
-
-	private JdbcTemplate jdbcTemplate;
 	
 	private DataSource dataSource;
 
 	public JsonObjectRepository(DataSource dataSource) {
-//        jdbcTemplate = new JdbcTemplate(dataSource);
         this.dataSource = dataSource;
 	}
 	
@@ -64,35 +58,18 @@ public class JsonObjectRepository {
                 pgConnection = dataSource.getConnection().unwrap(PgConnection.class);
             }
 	        
-	        // use connection
-	        // cast to the pg extension interface
-//	        pgstmt =  (PgStatement) pgConnection.prepareStatement(query);
-	        
 	        pgstmt =  (PgStatement) pgConnection.createStatement();
 
 	        pgResultSet = (PgResultSet) pgstmt.executeQuery(query);
-
-
-//            pstmt =  conn.prepareStatement(query);
             
             ResultSetMetaData resultSetMetaData = pgResultSet.getMetaData();
 
             List<DataMeta> dataMetaList = MetaDataUtils.getMetaDataList(resultSetMetaData);
-	        
-	        
-	       /* pstmt = conn.prepareStatement(query);
-	        
-            resultSet = pstmt.executeQuery();
-
-            ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
-
-            List<DataMeta> dataMetaList = MetaDataUtils.getMetaDataList(resultSetMetaData);*/
 
             mapRet.put("meta", dataMetaList);
 
             JSONArray nodeJsonArr = new JSONArray(); // 파싱된 값 전체를 담을 배열
 
-//            while (resultSet.next()) {
             while (pgResultSet.next()) {
                 // ResultSet의 결과를 LinkedHashMap에 저장 - put 순서대로 꺼내기 위해
                 JSONObject rowJsonObject = new JSONObject();
@@ -105,12 +82,13 @@ public class JsonObjectRepository {
 
             mapRet.put("rows", nodeJsonArr);
 
-	    } catch (ParseException e) {
-            e.printStackTrace();
+	    } catch (ParseException ex) {
+	        ex.printStackTrace();
             
-        } catch (SQLException e) {
-            e.printStackTrace();
-            throw new QueryException (e.getMessage(), "or SQL_EXCEPTION");
+        } catch (SQLException ex) {
+            JDBCTutorialUtilities.printSQLException(ex);
+            ex.printStackTrace();
+            throw new QueryException (JDBCTutorialUtilities.getSQLState(ex), ex);
             
         } finally {
             if (pgConnection != null) try { pgConnection.close(); } catch (SQLException e) {}
@@ -119,48 +97,6 @@ public class JsonObjectRepository {
 	    }
         return mapRet;
 	}
-	
-
-	/*public JSONObject getJson(String query) throws UnsupportedEncodingException {
-	    
-		return jdbcTemplate.query(query, new ResultSetExtractor<JSONObject>() {
-			@Override
-			public JSONObject extractData(ResultSet resultSet) throws SQLException, DataAccessException {
-				JSONObject mapRet = new JSONObject();
-
-				ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
-
-				List<DataMeta> dataMetaList = MetaDataUtils.getMetaDataList(resultSetMetaData);
-
-				mapRet.put("meta", dataMetaList);
-
-				JSONArray nodeJsonArr = new JSONArray(); // 파싱된 값 전체를 담을 배열
-
-				int colCnt = resultSetMetaData.getColumnCount();
-				while (resultSet.next()) {
-					// ResultSet의 결과를 LinkedHashMap에 저장 - put 순서대로 꺼내기 위해
-					JSONObject rowJsonObject = new JSONObject();
-
-					for (int count = 1; count <= colCnt; count++) { // i가 1부터
-																	// 시작함에 유의
-						try {
-							setChangeType(resultSet, resultSetMetaData, rowJsonObject, count); // 컬럼의 타입별로 해당타입으로 변환하여 jsonObject에 put.
-						} catch (ParseException e) {
-                            e.printStackTrace();
-                        } catch (SQLException e) {
-                            e.printStackTrace();
-                            throw new QueryException (e.getMessage(), "or SQL_EXCEPTION");
-                        }
-					}
-					nodeJsonArr.add(rowJsonObject);
-				}
-
-				mapRet.put("rows", nodeJsonArr);
-
-				return mapRet;
-			}
-		});
-	}*/
 
 	private void setChangeType(PgResultSet pgResultSet, ResultSetMetaData resultSetMetaData, JSONObject rowJsonObject,
 			int cnt) throws ParseException, SQLException {

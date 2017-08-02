@@ -1,15 +1,27 @@
 package net.bitnine.exception;
 
-public class InvalidTokenException extends Exception {
+import net.bitnine.util.messages.ErrorCodes;
 
-    public InvalidTokenException() { }
+public class InvalidTokenException extends RuntimeException {
+
+    private static final long serialVersionUID = 1L;
+    private String message;
+    
+    public InvalidTokenException() {
+        this.message = ErrorCodes.INVALID_TOKEN_EXCEPTION;
+    }
+    
     public InvalidTokenException(String message) {
-        super (message);
+        super (ErrorCodes.INVALID_TOKEN_EXCEPTION);
+        this.message = message;
     }
-
-
-    @Override
+    
     public String getMessage() {
-        return super.getMessage();
+        return message;
     }
+    public void setMessage(String message) {
+        this.message = message;
+    }
+    
+    
 }
