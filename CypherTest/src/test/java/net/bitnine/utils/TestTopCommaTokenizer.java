@@ -4,6 +4,8 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+import net.bitnine.util.TopCommaTokenizer;
+
 public class TestTopCommaTokenizer {
 
 	public static void main(String[] args) {

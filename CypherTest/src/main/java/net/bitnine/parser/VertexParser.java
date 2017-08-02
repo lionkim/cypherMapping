@@ -15,7 +15,7 @@ import org.postgresql.util.PSQLException;
 import org.postgresql.util.PSQLState;
 
 import net.bitnine.domain.Vertex;
-import net.bitnine.utils.TopCommaTokenizer;
+import net.bitnine.util.TopCommaTokenizer;
 
 public class VertexParser {
     private static final Pattern _pattern;

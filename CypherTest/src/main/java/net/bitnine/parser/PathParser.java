@@ -13,7 +13,7 @@ import org.postgresql.util.PSQLState;
 import net.bitnine.domain.Path;
 import net.bitnine.domain.Edge;
 import net.bitnine.domain.Vertex;
-import net.bitnine.utils.TopCommaTokenizer;
+import net.bitnine.util.TopCommaTokenizer;
 
 public class PathParser {
     

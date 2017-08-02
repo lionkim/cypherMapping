@@ -7,6 +7,7 @@ import org.postgresql.util.PGtokenizer;
 
 import net.bitnine.domain.Vertex;
 import net.bitnine.parser.VertexParser;
+import net.bitnine.util.TopCommaTokenizer;
 
 public class TestVertexParser {
     public static void main(String[] args) throws SQLException, ParseException {

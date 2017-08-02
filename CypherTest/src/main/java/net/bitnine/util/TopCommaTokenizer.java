@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package net.bitnine.utils;
+package net.bitnine.util;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -38,7 +38,7 @@ import net.bitnine.exception.QueryException;
 import net.bitnine.parser.EdgeParser;
 import net.bitnine.parser.PathParser;
 import net.bitnine.parser.VertexParser;
-import net.bitnine.utils.MetaDataUtils;
+import net.bitnine.util.MetaDataUtils;
 
 @Repository
 public class JsonObjectRepository {

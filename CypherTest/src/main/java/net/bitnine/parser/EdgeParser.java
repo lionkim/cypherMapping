@@ -15,7 +15,7 @@ import org.postgresql.util.PSQLException;
 import org.postgresql.util.PSQLState;
 
 import net.bitnine.domain.Edge;
-import net.bitnine.utils.TopCommaTokenizer;
+import net.bitnine.util.TopCommaTokenizer;
 
 public class EdgeParser {
     private static Pattern _pattern;

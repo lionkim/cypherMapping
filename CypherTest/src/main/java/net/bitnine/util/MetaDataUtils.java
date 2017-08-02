@@ -1,4 +1,4 @@
-package net.bitnine.utils;
+package net.bitnine.util;
 
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
