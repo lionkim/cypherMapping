@@ -2,6 +2,12 @@ package net.bitnine.exception;
 
 import net.bitnine.util.messages.ErrorCodes;
 
+/**
+ * 올바르지 않은 DataSource 사용자 Exception
+ * @Author  : 김형우
+ * @Date	  : 2017. 8. 1.
+ *
+ */
 public class InValidDataSourceException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;

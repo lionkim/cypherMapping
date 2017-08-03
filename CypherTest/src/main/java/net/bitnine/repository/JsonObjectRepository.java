@@ -56,18 +56,22 @@ public class JsonObjectRepository {
 	}
 
 
+	/**
+	 * 사용자 query의 결과를 json으로 반환하는 메소드
+	 * @param query
+	 * @return
+	 * @throws QueryException
+	 */
 	public JSONObject getJson(String query) throws QueryException {
-        PgConnection pgConnection  = null;
+        PgConnection pgConnection  = null;      // postgresql api 사용
         PgResultSet pgResultSet = null;
         PgStatement pgstmt = null;
         
 //        JSONObject mapRet = new JSONObject();
-        JSONObject mapRet = new JSONObject(new TreeMap ());
+        JSONObject mapRet = new JSONObject(new TreeMap ());     // 리턴할 jsonObject
 //      JSONObject mapRet = null;
-        
-        String maxRow = propertiesService.getSetMax();
-        
-        int maxRows = Integer.parseInt(maxRow);
+                
+        int maxRows = Integer.parseInt(propertiesService.getSetMax());      // query 결과값 limit set. setResultRows 메소드 사용. 기본값은 application.properties 파일의 setMax: 10
         
 	    try {
             if (dataSource.getConnection().isWrapperFor(PgConnection.class)) {
@@ -82,7 +86,7 @@ public class JsonObjectRepository {
             
             ResultSetMetaData resultSetMetaData = pgResultSet.getMetaData();
 
-            List<DataMeta> dataMetaList = MetaDataUtils.getMetaDataList(resultSetMetaData);
+            List<DataMeta> dataMetaList = MetaDataUtils.getMetaDataList(resultSetMetaData);     // MetaDataUtils.getMetaDataList을 사용하여 meta데이터 생성.
 
 
             JSONArray nodeJsonArr = new JSONArray(); // 파싱된 값 전체를 담을 배열
@@ -97,6 +101,7 @@ public class JsonObjectRepository {
                 nodeJsonArr.add(rowJsonObject);
 	        }
 
+            // 반환할 JSONObject에 지정포맷으로 값을 설정.
             mapRet.put("status", "success");
             mapRet.put("meta", dataMetaList);
             mapRet.put("rows", nodeJsonArr);
@@ -107,7 +112,7 @@ public class JsonObjectRepository {
         } catch (SQLException ex) {
             JDBCTutorialUtilities.printSQLException(ex);
             ex.printStackTrace();
-            throw new QueryException (JDBCTutorialUtilities.getSQLState(ex), ex);
+            throw new QueryException (JDBCTutorialUtilities.getSQLState(ex), ex);       // custom exception 사용.
             
         } finally {
             if (pgConnection != null) try { pgConnection.close(); } catch (SQLException e) {}
@@ -117,6 +122,15 @@ public class JsonObjectRepository {
         return mapRet;
 	}
 
+	/**
+	 * 타입별 해당 postgresql api 사용하여 컬럼값을 가져오고 JSONObject에 (columnName, 값) 저장함.
+	 * @param pgResultSet
+	 * @param resultSetMetaData
+	 * @param rowJsonObject
+	 * @param cnt
+	 * @throws ParseException
+	 * @throws SQLException
+	 */
 	private void setChangeType(PgResultSet pgResultSet, ResultSetMetaData resultSetMetaData, JSONObject rowJsonObject,
 			int cnt) throws ParseException, SQLException {
 	    PathParser pathParser = new PathParser();
@@ -124,7 +138,7 @@ public class JsonObjectRepository {
 	    VertexParser vertexParser = new VertexParser();
 	    
 		JSONParser parser = new JSONParser();
-		String columnTypeName = resultSetMetaData.getColumnTypeName(cnt);
+		String columnTypeName = resultSetMetaData.getColumnTypeName(cnt);     // 이 메소드를 호출하는 부분이 반복문임. 해당하는 count를 전달받아 columnTypeName 반환.
 		String columnName = resultSetMetaData.getColumnLabel(cnt);
 		
 		System.out.println("columnTypeName: " + columnTypeName);

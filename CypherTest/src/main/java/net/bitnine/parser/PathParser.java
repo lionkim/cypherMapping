@@ -17,6 +17,14 @@ import net.bitnine.util.TopCommaTokenizer;
 
 public class PathParser {
     
+    /**
+     * 
+     * 쿼리를 실행한 결과값을 Path로 변환
+     * @param result
+     * @return
+     * @throws SQLException
+     * @throws ParseException
+     */
     public Path createParsedPath (String result) throws SQLException, ParseException {
         String type = "path";
         List<Vertex> vertices = new ArrayList<>();

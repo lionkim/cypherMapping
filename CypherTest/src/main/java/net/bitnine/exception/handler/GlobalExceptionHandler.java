@@ -16,11 +16,24 @@ import net.bitnine.exception.QueryException;
 import net.bitnine.exception.test.BaseException;
 import net.bitnine.exception.test.TestException;
 
+/**
+ * 사용자 exception을 전역범위에서 설정하는 advice
+ * @Author  : 김형우
+ * @Date	  : 2017. 8. 1.
+ *
+ */
 @ControllerAdvice
 @RestController
 public class GlobalExceptionHandler {
 
 
+    /**
+     * QueryException
+     * @param ex
+     * @param queryException
+     * @param request
+     * @return
+     */
     @ExceptionHandler(value = { QueryException.class })
     @ResponseBody
     protected ErrorMessage handleQueryException(SQLException ex, QueryException queryException, WebRequest request) {
@@ -30,10 +43,14 @@ public class GlobalExceptionHandler {
         em.setMessage(ex.getMessage());
         return em;
     }
-    
 
-
-
+    /**
+     * InValidDataSourceException
+     * @param ex
+     * @param inValidDataSourceException
+     * @param request
+     * @return
+     */
     @ExceptionHandler(value = { InValidDataSourceException.class })
     @ResponseBody
     protected ErrorMessage handleInValidDataSourceException(SQLException ex, InValidDataSourceException inValidDataSourceException, WebRequest request) {
@@ -44,7 +61,12 @@ public class GlobalExceptionHandler {
         return em;
     }
    
-    
+    /**
+     * InvalidTokenException
+     * @param ex
+     * @param request
+     * @return
+     */
     @ExceptionHandler(value = { InvalidTokenException.class })
     @ResponseStatus(HttpStatus.UNAUTHORIZED )
     @ResponseBody
@@ -83,7 +105,12 @@ public class GlobalExceptionHandler {
     }
 }
 
-
+/**
+ * 에러 메시지 DTO
+ * @Author  : 김형우
+ * @Date	  : 2017. 8. 1.
+ *
+ */
 class ErrorMessage {
 	private String status;
     private String errorCode;

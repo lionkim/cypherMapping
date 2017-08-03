@@ -24,6 +24,14 @@ public class VertexParser {
         _pattern = Pattern.compile("(.+)\\[(\\d+)\\.(\\d+)\\](.*)");
     }
 
+    /**
+     * 
+     * 쿼리를 실행한 결과값을 vertextList로 변환
+     * @param result
+     * @return
+     * @throws SQLException
+     * @throws ParseException
+     */
     public List<Vertex> createParsedVertextList(String result) throws SQLException, ParseException {
         TopCommaTokenizer topCommaTokenizer = new TopCommaTokenizer(result);
         List<Vertex> vertextList = new ArrayList<>();

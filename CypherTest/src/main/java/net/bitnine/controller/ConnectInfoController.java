@@ -7,6 +7,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import net.bitnine.domain.ConnectInfos;
 
+/**
+ * 관리자가 사용자들의 접속 및 쿼리 정보를 조회하는 컨트롤러
+ * @Author  : 김형우
+ * @Date	  : 2017. 7. 29.
+ *
+ */
 @RestController
 public class ConnectInfoController {
 

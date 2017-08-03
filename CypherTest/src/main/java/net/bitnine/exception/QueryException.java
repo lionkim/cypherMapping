@@ -2,6 +2,13 @@ package net.bitnine.exception;
 
 import java.sql.SQLException;
 
+/**
+ * 
+ * 올바르지 않은 DB관련  사용자 Exception
+ * @Author  : 김형우
+ * @Date	  : 2017. 8. 3.
+ *
+ */
 public class QueryException extends SQLException {
 
     private static final long serialVersionUID = 1L;
