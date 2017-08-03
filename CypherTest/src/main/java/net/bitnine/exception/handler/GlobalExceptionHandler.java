@@ -25,7 +25,8 @@ public class GlobalExceptionHandler {
     @ResponseBody
     protected ErrorMessage handleQueryException(SQLException ex, QueryException queryException, WebRequest request) {
         ErrorMessage em = new ErrorMessage();
-        em.setStatus (queryException.getStatus());
+        em.setStatus ("failure");
+        em.setErrorCode (queryException.getStatus());
         em.setMessage(ex.getMessage());
         return em;
     }
@@ -37,18 +38,20 @@ public class GlobalExceptionHandler {
     @ResponseBody
     protected ErrorMessage handleInValidDataSourceException(SQLException ex, InValidDataSourceException inValidDataSourceException, WebRequest request) {
         ErrorMessage em = new ErrorMessage();
-        em.setStatus (inValidDataSourceException.getErrorCode());
+        em.setStatus ("failure");
+        em.setErrorCode (inValidDataSourceException.getErrorCode());
         em.setMessage(inValidDataSourceException.getMessage());
         return em;
     }
    
     
     @ExceptionHandler(value = { InvalidTokenException.class })
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED )
     @ResponseBody
     protected ErrorMessage handleInvalidTokenException(RuntimeException ex, WebRequest request) {
         ErrorMessage em = new ErrorMessage();
-        em.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.toString());
+        em.setStatus ("failure");
+        em.setErrorCode (HttpStatus.UNAUTHORIZED.toString());
         em.setMessage(ex.getMessage());
         return em;
     }
@@ -73,7 +76,8 @@ public class GlobalExceptionHandler {
     @ResponseBody
     protected ErrorMessage handleConflict(RuntimeException ex, WebRequest request) {
         ErrorMessage em = new ErrorMessage();
-        em.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.toString());
+        em.setStatus ("failure");
+        em.setErrorCode (HttpStatus.INTERNAL_SERVER_ERROR.toString());
         em.setMessage(ex.getMessage());
         return em;
     }

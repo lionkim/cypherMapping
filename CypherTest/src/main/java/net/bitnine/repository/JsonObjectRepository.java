@@ -11,8 +11,10 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -59,15 +61,17 @@ public class JsonObjectRepository {
         PgResultSet pgResultSet = null;
         PgStatement pgstmt = null;
         
-        JSONObject mapRet = new JSONObject();
-
+//        JSONObject mapRet = new JSONObject();
+        JSONObject mapRet = new JSONObject(new TreeMap ());
+//      JSONObject mapRet = null;
+        
         String maxRow = propertiesService.getSetMax();
         
         int maxRows = Integer.parseInt(maxRow);
         
 	    try {
             if (dataSource.getConnection().isWrapperFor(PgConnection.class)) {
-                pgConnection = dataSource.getConnection().unwrap(PgConnection.class);
+                pgConnection = dataSource.getConnection().unwrap(PgConnection.class);       // dataSource에서 PgConnection를 가져옴.
             }
 	        
 	        pgstmt =  (PgStatement) pgConnection.createStatement();
@@ -93,7 +97,7 @@ public class JsonObjectRepository {
                 nodeJsonArr.add(rowJsonObject);
 	        }
 
-            mapRet.put("meta", "success");
+            mapRet.put("status", "success");
             mapRet.put("meta", dataMetaList);
             mapRet.put("rows", nodeJsonArr);
 
@@ -129,7 +133,7 @@ public class JsonObjectRepository {
 
 		// number에는 int, long, double, float 등
 		case "number":
-		    int result = pgResultSet.getInt(columnName);
+		    long result = pgResultSet.getLong(columnName);
 			rowJsonObject.put(columnName, result);
 			break;
 
@@ -139,18 +143,38 @@ public class JsonObjectRepository {
             break;
 
         case "int8":
-            int int8Result = pgResultSet.getInt(columnName);
+            long int8Result = pgResultSet.getLong(columnName);
             rowJsonObject.put(columnName, int8Result);
             break;
             
         case "decimal":
-            Double decimalResult = pgResultSet.getDouble(columnName);
+            float decimalResult = pgResultSet.getFloat(columnName);
             rowJsonObject.put(columnName, decimalResult);
             break;
             
         case "numeric":
-            Double numericResult = pgResultSet.getDouble(columnName);
+            float numericResult = pgResultSet.getFloat(columnName);
             rowJsonObject.put(columnName, numericResult);
+            break;
+            
+        case "float4":
+            float float4Result = pgResultSet.getFloat(columnName);
+            rowJsonObject.put(columnName, float4Result);
+            break;
+            
+        case "float8":
+            float float8Result = pgResultSet.getFloat(columnName);
+            rowJsonObject.put(columnName, float8Result);
+            break;
+            
+        case "serial":
+            float serialResult = pgResultSet.getFloat(columnName);
+            rowJsonObject.put(columnName, serialResult);
+            break;
+            
+        case "bigserial":
+            float bigserialResult = pgResultSet.getFloat(columnName);
+            rowJsonObject.put(columnName, bigserialResult);
             break;
             
 		case "varchar":
@@ -159,7 +183,8 @@ public class JsonObjectRepository {
 			break;
 
 		case "graphid":
-		    Double doubleResult = pgResultSet.getDouble(columnName);
+//            Double doubleResult = pgResultSet.getDouble(columnName);
+            String doubleResult = pgResultSet.getString(columnName);
 
 			rowJsonObject.put(columnName, doubleResult);
 			break;
