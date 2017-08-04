@@ -67,9 +67,9 @@ public class TokenAuthentication {
                 .setIssuedAt(now)
                 .setNotBefore(now)
                 .setExpiration(exp)								// expired time
-                .claim("url", dataSourceDTO.getUrl())
+               /* .claim("url", dataSourceDTO.getUrl())
                 .claim("username", dataSourceDTO.getUsername())
-                .claim("password", dataSourceDTO.getPassword())
+                .claim("password", dataSourceDTO.getPassword())*/
                 .signWith(SignatureAlgorithm.HS256, base64SecretByptes).compact();
         
         return token;        

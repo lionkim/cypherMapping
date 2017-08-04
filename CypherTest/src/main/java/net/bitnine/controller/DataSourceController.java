@@ -3,10 +3,12 @@ package net.bitnine.controller;
 import java.sql.SQLException;
 import java.util.Date;
 
+import javax.naming.NamingException;
 import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 
 import org.json.simple.JSONObject;
+import org.postgresql.ds.PGPoolingDataSource;
 import org.postgresql.jdbc.PgConnection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
@@ -46,29 +48,26 @@ public class DataSourceController {
     @Autowired private DataSourceMap dataSourceMap;
     
     @RequestMapping("/connect")
-    public JSONObject connect(DataSourceDTO dataSourceDTO) throws QueryException {
+    public JSONObject connect(DataSourceDTO dataSourceDTO) throws QueryException, NamingException {
         JSONObject jsonObject = new JSONObject();
-        DataSource dataSource = databaseService.createDataSource(dataSourceDTO);
+//        DataSource dataSource = databaseService.createDataSource(dataSourceDTO);
+        
+        
 //      System.out.println("dataSource: " + dataSource);
         
-        try {
-            dataSource.getConnection();     // 유효한 dataSource인지를 체크
+        String tokenString = tokenAuthentication.generateToken(dataSourceDTO);
 
-            String tokenString = tokenAuthentication.generateToken(dataSourceDTO);
-            
-            dataSourceMap.getDataSources().put(tokenString, dataSource);
-            
-            System.out.println("dataSource: " + dataSource);
-            
-            jsonObject.put("token", tokenString);
-            
-            jsonObject.put("message", "Database Connect Success");
-            
-        } catch (SQLException ex) {
-            JDBCTutorialUtilities.printSQLException(ex);
-            ex.printStackTrace();
-            throw new QueryException (JDBCTutorialUtilities.getSQLState(ex), ex);            
-        }
+        databaseService.createPGPoolingDataSource(dataSourceDTO, tokenString);
+        
+//            dataSourceMap.getDataSources().put(tokenString, pgPoolingDataSource);            
+//            System.out.println("pgPoolingDataSource: " + pgPoolingDataSource);
+        
+         /* dataSourceMap.getDataSources().put(tokenString, dataSource);            
+        System.out.println("dataSource: " + dataSource);*/
+        
+        jsonObject.put("token", tokenString);
+        
+        jsonObject.put("message", "Database Connect Success");
         
         return jsonObject;
     }

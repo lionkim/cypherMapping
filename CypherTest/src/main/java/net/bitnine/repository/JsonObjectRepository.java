@@ -20,11 +20,13 @@ import java.util.regex.Pattern;
 
 import javax.sql.DataSource;
 
+import org.apache.commons.dbcp.BasicDataSource;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.postgresql.jdbc.PgStatement;
+import org.postgresql.ds.PGPoolingDataSource;
 import org.postgresql.jdbc.PgConnection;
 import org.postgresql.jdbc.PgResultSet;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,15 +47,24 @@ import net.bitnine.util.MetaDataUtils;
 public class JsonObjectRepository {
 
     @Autowired private PropertiesService propertiesService;
+
+    private PGPoolingDataSource dataSource;
+    public PGPoolingDataSource getDataSource() {
+        return dataSource;
+    }
+    public void setDataSource(PGPoolingDataSource dataSource) {
+        this.dataSource = dataSource;
+    }
     
-	private DataSource dataSource;
+   /* private BasicDataSource dataSource;
 	
-	public DataSource getDataSource() {
-		return dataSource;
-	}
-	public void setDataSource(DataSource dataSource) {
-		this.dataSource = dataSource;
-	}
+	
+    public BasicDataSource getDataSource() {
+        return dataSource;
+    }
+    public void setDataSource(BasicDataSource dataSource) {
+        this.dataSource = dataSource;
+    }*/
 
 
 	/**
@@ -77,6 +88,8 @@ public class JsonObjectRepository {
             if (dataSource.getConnection().isWrapperFor(PgConnection.class)) {
                 pgConnection = dataSource.getConnection().unwrap(PgConnection.class);       // dataSource에서 PgConnection를 가져옴.
             }
+            
+//            pgConnection = (PgConnection) dataSource.getConnection();
 	        
 	        pgstmt =  (PgStatement) pgConnection.createStatement();	        
 	        pgstmt.setMaxRows(maxRows);			// 반환하는 row 수를 maxRows 값으로 설정함. maxRows값은 application.properties의 setMax 값. 관리자가 런타임 수정가능
