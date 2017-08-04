@@ -18,6 +18,7 @@ import net.bitnine.domain.ConnectInfos;
 import net.bitnine.domain.dto.DataSourceDTO;
 import net.bitnine.exception.InvalidTokenException;
 import net.bitnine.exception.QueryException;
+import net.bitnine.jwt.DataSourceMap;
 import net.bitnine.jwt.TokenAuthentication;
 import net.bitnine.repository.JsonObjectRepository;
 
@@ -27,9 +28,15 @@ public class JsonObjectService {
     @Autowired private TokenAuthentication tokenAuthentication;
     @Autowired private JsonObjectRepository repository;
 
+    @Autowired private DataSourceMap dataSourceMap;
+    
     public JSONObject getJson (String query, String Authorization) throws UnsupportedEncodingException, InvalidTokenException, QueryException {
+        
+        
+        DataSource dataSource = dataSourceMap.getDataSources().get(Authorization);
+        
 //        TokenAuthentication tokenAuthentication = new TokenAuthentication();
-        Claims claims = tokenAuthentication.getClaims(Authorization);       // 해당토큰을 가져옴. getClaims()에서 유효성 검사.
+        /*Claims claims = tokenAuthentication.getClaims(Authorization);       // 해당토큰을 가져옴. getClaims()에서 유효성 검사.
         
         DataSourceDTO dataSourceDTO = new DataSourceDTO();
 
@@ -40,9 +47,9 @@ public class JsonObjectService {
         }
         else {
             throw new InvalidTokenException();
-        }
+        }*/
         
-        DataSource dataSource = databaseService.createDataSource(dataSourceDTO);
+        //DataSource dataSource = databaseService.createDataSource(dataSourceDTO);
         
         System.out.println("dataSource: " + dataSource);
         

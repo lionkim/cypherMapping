@@ -45,9 +45,7 @@ public class TokenAuthentication {
     
     public String generateToken(DataSourceDTO dataSourceDTO) {   
     	
-    	
     	//if (databaseService.createDataSource(dataSourceDTO) == null) throw new InValidDataSourceException();
-
     	
     	String id = UUID.randomUUID().toString().replace("-", "");
         Date now = new Date();
@@ -60,9 +58,6 @@ public class TokenAuthentication {
 
        /* System.out.println("base64SecretByptes: " + base64SecretByptes);
         System.out.println("id: " + id);*/
-       
-
-        
         
         // JJWT 를 사용하여 token 생성
         String token = Jwts.builder()

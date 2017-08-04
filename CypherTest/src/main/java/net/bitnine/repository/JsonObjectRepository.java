@@ -78,16 +78,13 @@ public class JsonObjectRepository {
                 pgConnection = dataSource.getConnection().unwrap(PgConnection.class);       // dataSource에서 PgConnection를 가져옴.
             }
 	        
-	        pgstmt =  (PgStatement) pgConnection.createStatement();
-	        
+	        pgstmt =  (PgStatement) pgConnection.createStatement();	        
 	        pgstmt.setMaxRows(maxRows);			// 반환하는 row 수를 maxRows 값으로 설정함. maxRows값은 application.properties의 setMax 값. 관리자가 런타임 수정가능
-
 	        pgResultSet = (PgResultSet) pgstmt.executeQuery(query);
             
             ResultSetMetaData resultSetMetaData = pgResultSet.getMetaData();
 
             List<DataMeta> dataMetaList = MetaDataUtils.getMetaDataList(resultSetMetaData);     // MetaDataUtils.getMetaDataList을 사용하여 meta데이터 생성.
-
 
             JSONArray nodeJsonArr = new JSONArray(); // 파싱된 값 전체를 담을 배열
 
@@ -105,7 +102,7 @@ public class JsonObjectRepository {
             mapRet.put("status", "success");
             mapRet.put("meta", dataMetaList);
             mapRet.put("rows", nodeJsonArr);
-
+            
 	    } catch (ParseException ex) {
 	        ex.printStackTrace();
             

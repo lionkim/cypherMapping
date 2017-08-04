@@ -21,6 +21,7 @@ import net.bitnine.domain.State;
 import net.bitnine.domain.dto.DataSourceDTO;
 import net.bitnine.exception.InvalidTokenException;
 import net.bitnine.exception.QueryException;
+import net.bitnine.jwt.DataSourceMap;
 import net.bitnine.jwt.TokenAuthentication;
 import net.bitnine.service.DatabaseService;
 import net.bitnine.util.JDBCTutorialUtilities;
@@ -42,31 +43,33 @@ public class DataSourceController {
     @Autowired private ConnectInfos connectInfos;
     @Autowired private TokenAuthentication tokenAuthentication;
     
+    @Autowired private DataSourceMap dataSourceMap;
+    
     @RequestMapping("/connect")
     public JSONObject connect(DataSourceDTO dataSourceDTO) throws QueryException {
         JSONObject jsonObject = new JSONObject();
         DataSource dataSource = databaseService.createDataSource(dataSourceDTO);
 //      System.out.println("dataSource: " + dataSource);
         
-
         try {
-			if (!dataSource.getConnection().isWrapperFor(PgConnection.class)) {
-			    throw new InvalidTokenException();        	
-			}
-		} catch (SQLException ex) {
+            dataSource.getConnection();     // 유효한 dataSource인지를 체크
+
+            String tokenString = tokenAuthentication.generateToken(dataSourceDTO);
+            
+            dataSourceMap.getDataSources().put(tokenString, dataSource);
+            
+            System.out.println("dataSource: " + dataSource);
+            
+            jsonObject.put("token", tokenString);
+            
+            jsonObject.put("message", "Database Connect Success");
+            
+        } catch (SQLException ex) {
             JDBCTutorialUtilities.printSQLException(ex);
             ex.printStackTrace();
             throw new QueryException (JDBCTutorialUtilities.getSQLState(ex), ex);            
-		}
+        }
         
-        if (dataSource != null) {
-            jsonObject.put("token", tokenAuthentication.generateToken(dataSourceDTO));
-            
-            jsonObject.put("message", "Database Connect Success");
-        }
-        else {
-            jsonObject.put("message", "Database Connect Failed");
-        }
         return jsonObject;
     }
 
