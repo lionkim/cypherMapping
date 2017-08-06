@@ -7,17 +7,21 @@ import io.jsonwebtoken.impl.crypto.MacProvider;
 import net.bitnine.domain.ConnectInfo;
 import net.bitnine.domain.ConnectInfos;
 import net.bitnine.domain.State;
-import net.bitnine.domain.dto.DataSourceDTO;
+import net.bitnine.domain.dto.DBConnectionInfo;
 import net.bitnine.exception.InValidDataSourceException;
+import net.bitnine.exception.QueryException;
 import net.bitnine.service.DatabaseService;
 import net.bitnine.service.PropertiesService;
+import net.bitnine.util.JDBCTutorialUtilities;
 
 /*import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;*/
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
 
+import org.apache.commons.dbcp.BasicDataSource;
 import org.postgresql.jdbc.PgConnection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,35 +33,38 @@ import java.util.UUID;
 import static java.util.Collections.emptyList;
 
 import java.security.Key;
+import java.sql.SQLException;
 import java.util.Base64;
 
+/**
+ * 사용자 토큰 생성
+ * @author cppco
+ *
+ */
 @Component
 public class TokenAuthentication {
     
 	@Autowired private DatabaseService databaseService;
 	
-    @Autowired private ConnectInfos connectInfos;
+	@Autowired private ConnectInfos connectInfos;    
         
-    private final Key secret = MacProvider.generateKey(SignatureAlgorithm.HS256);
+    private final Key secret = MacProvider.generateKey(SignatureAlgorithm.HS256);			// 비밀키생성
     private final byte[] secretBytes = secret.getEncoded();
-    private final String base64SecretByptes = Base64.getEncoder().encodeToString(secretBytes);    
+    private final String base64SecretByptes = Base64.getEncoder().encodeToString(secretBytes);    	// 비밀키로 base64 인코딩
     
-    
-    public String generateToken(DataSourceDTO dataSourceDTO) {   
-    	
-    	//if (databaseService.createDataSource(dataSourceDTO) == null) throw new InValidDataSourceException();
-    	
-    	String id = UUID.randomUUID().toString().replace("-", "");
-        Date now = new Date();
-//        int temp = (1000 * Integer.parseInt(setMax));
-        int temp = (1000 * 60 * 60);
+    /**
+     * 토큰생성, 사용 dbConnection정보확인 및 저장
+     * @param id 
+     * @param dbConnectionInfo
+     * @return
+     * @throws SQLException 
+     */
+    public String generateToken(String id, DBConnectionInfo dbConnectionInfo) throws SQLException {       	    	
 
-        System.out.println("temp: " + temp);
+		Date now = new Date();
+        int temp = (1000 * 60 * 60 * 24);		// 1000 millisecond.  1초 * 60 * 60 * 24 = 1일
         
-        Date exp = new Date(System.currentTimeMillis() + temp);
-
-       /* System.out.println("base64SecretByptes: " + base64SecretByptes);
-        System.out.println("id: " + id);*/
+        Date exp = new Date(System.currentTimeMillis() + temp);	// 만료시간
         
         // JJWT 를 사용하여 token 생성
         String token = Jwts.builder()
@@ -67,15 +74,12 @@ public class TokenAuthentication {
                 .setIssuedAt(now)
                 .setNotBefore(now)
                 .setExpiration(exp)								// expired time
-               /* .claim("url", dataSourceDTO.getUrl())
-                .claim("username", dataSourceDTO.getUsername())
-                .claim("password", dataSourceDTO.getPassword())*/
+                .claim("id", id)									// 구별 id를 저장
                 .signWith(SignatureAlgorithm.HS256, base64SecretByptes).compact();
-        
-        return token;        
+		return token;
     }
-    
-    /**
+
+	/**
      * Authorization에 해당하는 Claims을 리턴.
      * @param Authorization
      * @return

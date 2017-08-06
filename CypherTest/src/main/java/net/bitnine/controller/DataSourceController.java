@@ -2,6 +2,7 @@ package net.bitnine.controller;
 
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.UUID;
 
 import javax.naming.NamingException;
 import javax.servlet.http.HttpSession;
@@ -20,11 +21,12 @@ import io.jsonwebtoken.Claims;
 import net.bitnine.domain.ConnectInfo;
 import net.bitnine.domain.ConnectInfos;
 import net.bitnine.domain.State;
-import net.bitnine.domain.dto.DataSourceDTO;
+import net.bitnine.domain.dto.DBConnectionInfo;
 import net.bitnine.exception.InvalidTokenException;
 import net.bitnine.exception.QueryException;
 import net.bitnine.jwt.DataSourceMap;
 import net.bitnine.jwt.TokenAuthentication;
+import net.bitnine.jwt.UserInfoMap;
 import net.bitnine.service.DatabaseService;
 import net.bitnine.util.JDBCTutorialUtilities;
 
@@ -46,24 +48,21 @@ public class DataSourceController {
     @Autowired private TokenAuthentication tokenAuthentication;
     
     @Autowired private DataSourceMap dataSourceMap;
-    
-    @RequestMapping("/connect")
-    public JSONObject connect(DataSourceDTO dataSourceDTO) throws QueryException, NamingException {
-        JSONObject jsonObject = new JSONObject();
-//        DataSource dataSource = databaseService.createDataSource(dataSourceDTO);
-        
-        
-//      System.out.println("dataSource: " + dataSource);
-        
-        String tokenString = tokenAuthentication.generateToken(dataSourceDTO);
 
-        databaseService.createPGPoolingDataSource(dataSourceDTO, tokenString);
+	@Autowired private UserInfoMap userInfoMap;    
+	
+    @RequestMapping("/connect")
+    public JSONObject connect(DBConnectionInfo dbConnectionInfo) throws NamingException, SQLException {
+
+    	JSONObject jsonObject = new JSONObject();     
+    	
+    	checkValidDataSource(dbConnectionInfo);		// 사용자로부터 전달받은 dbconnect 정보로 생성한 dataSource의 유효성을 체크 
+
+    	String id = generateId();		// 사용자 정보 아이디, token 아이디 생성
+
+        String tokenString = tokenAuthentication.generateToken(id, dbConnectionInfo);		// token 아이디와 사용자로부터 전달받은 dbconnect 정보로 token 생성.
         
-//            dataSourceMap.getDataSources().put(tokenString, pgPoolingDataSource);            
-//            System.out.println("pgPoolingDataSource: " + pgPoolingDataSource);
-        
-         /* dataSourceMap.getDataSources().put(tokenString, dataSource);            
-        System.out.println("dataSource: " + dataSource);*/
+        saveConnectionInfo(id, dbConnectionInfo);	// 사용자 db 접속정보를 application scope 객체 에 저장.
         
         jsonObject.put("token", tokenString);
         
@@ -72,6 +71,22 @@ public class DataSourceController {
         return jsonObject;
     }
 
+
+	// token 아이디 생성
+	private String generateId() {
+		return UUID.randomUUID().toString().replace("-", "");
+	}
+    
+    // 사용자로부터 전달받은 정보로 생성한 dataSource의 유효성을 체크
+    private void checkValidDataSource(DBConnectionInfo dbConnectionInfo) throws SQLException {    	
+    	databaseService.checkValidDataSource(dbConnectionInfo);	
+	}
+
+
+    // 사용자 db 접속정보를 application scope 객체 에 저장.
+	private void saveConnectionInfo(String id, DBConnectionInfo dbConnectionInfo) {
+		userInfoMap.getUserInfos().put(id, dbConnectionInfo);		
+	}
     
     @RequestMapping("/disconnect")
     public String disConnect(@RequestHeader(value="Authorization") String authorization)  {

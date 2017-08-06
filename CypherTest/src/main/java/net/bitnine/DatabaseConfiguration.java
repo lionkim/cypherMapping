@@ -18,13 +18,14 @@ import javax.sql.DataSource;
 
 @Configuration
 @EnableTransactionManagement
-public class DatabaseConfiguration implements EnvironmentAware {
+//public class DatabaseConfiguration implements EnvironmentAware {
 
+public class DatabaseConfiguration {
     private static final Logger log = LoggerFactory.getLogger(DatabaseConfiguration.class);
 
     private RelaxedPropertyResolver propertyResolver;
 
-    @Override
+    /*@Override
     public  void setEnvironment(Environment env) {
         this.propertyResolver = new RelaxedPropertyResolver(env, "spring.datasource.");
     }
@@ -65,5 +66,5 @@ public class DatabaseConfiguration implements EnvironmentAware {
             log.error("dataSource: msg=" + e.getMessage(), e);
             throw new ApplicationContextException("Database connection pool creation resulted in error");
         }
-    }
+    }*/
 }

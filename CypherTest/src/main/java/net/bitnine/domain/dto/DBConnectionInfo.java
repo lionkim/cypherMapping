@@ -1,14 +1,14 @@
 package net.bitnine.domain.dto;
 
-public class DataSourceDTO {
+public class DBConnectionInfo {
 	private String url;
 	private String username;
 	private String password;
 
-	public DataSourceDTO() {
+	public DBConnectionInfo() {
 	}
 	
-	public DataSourceDTO(String url, String username, String password) {
+	public DBConnectionInfo(String url, String username, String password) {
 		this.url = url;
 		this.username = username;
 		this.password = password;

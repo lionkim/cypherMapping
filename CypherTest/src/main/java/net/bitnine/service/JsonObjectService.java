@@ -19,55 +19,43 @@ import org.springframework.stereotype.Service;
 
 import io.jsonwebtoken.Claims;
 import net.bitnine.domain.ConnectInfos;
-import net.bitnine.domain.dto.DataSourceDTO;
+import net.bitnine.domain.dto.DBConnectionInfo;
 import net.bitnine.exception.InvalidTokenException;
 import net.bitnine.exception.QueryException;
 import net.bitnine.jwt.DataSourceMap;
+import net.bitnine.jwt.TokenAuthentication;
+import net.bitnine.jwt.UserInfoMap;
 //import net.bitnine.jwt.TokenAuthentication;
 import net.bitnine.repository.JsonObjectRepository;
 
 @Service
 public class JsonObjectService {
-   /* @Autowired private DatabaseService databaseService;
-    @Autowired private TokenAuthentication tokenAuthentication;*/
+    @Autowired private DatabaseService databaseService;
+    @Autowired private TokenAuthentication tokenAuthentication;
     @Autowired private JsonObjectRepository repository;
 
-    @Autowired private DataSourceMap dataSourceMap;
+    @Autowired private UserInfoMap userInfoMap;
     
     public JSONObject getJson (String query, String Authorization) throws UnsupportedEncodingException, InvalidTokenException, QueryException, NamingException {
         
+        Claims claims = tokenAuthentication.getClaims(Authorization);       // 해당토큰을 가져옴. getClaims()에서 유효성 검사.
         
-//        DataSource dataSource = dataSourceMap.getDataSources().get(Authorization);
-//        PGPoolingDataSource pgPoolingDataSource = dataSourceMap.getDataSources().get(Authorization);
-
-        Authorization = Authorization.replaceAll("\\.","");
-
-//        BasicDataSource dataSource = (BasicDataSource) new InitialContext().lookup("java:comp/env/jdbc/" + Authorization);
-//        BasicDataSource dataSource = (BasicDataSource) new InitialContext().lookup(Authorization);
+        String userId = "";
         
-        PGPoolingDataSource dataSource = (PGPoolingDataSource) new InitialContext().lookup("java:/comp/env/jdbc/" + Authorization);
-//        PGPoolingDataSource pgPoolingDataSource = (PGPoolingDataSource) new InitialContext().lookup(Authorization);
-        
-//        TokenAuthentication tokenAuthentication = new TokenAuthentication();
-        /*Claims claims = tokenAuthentication.getClaims(Authorization);       // 해당토큰을 가져옴. getClaims()에서 유효성 검사.
-        
-        DataSourceDTO dataSourceDTO = new DataSourceDTO();
-
         if (claims != null) {
-            dataSourceDTO.setUrl((String) claims.get("url"));
-            dataSourceDTO.setUsername((String) claims.get("username"));
-            dataSourceDTO.setPassword((String) claims.get("password"));
+        	userId = (String) claims.get("id");        
         }
         else {
             throw new InvalidTokenException();
-        }*/
+        }
         
-        //DataSource dataSource = databaseService.createDataSource(dataSourceDTO);
+        DBConnectionInfo dbConnectionInfo = userInfoMap.getUserInfos().get(userId);
+                
+        DataSource dataSource = databaseService.createDataSource(dbConnectionInfo);
         
         System.out.println("dataSource: " + dataSource);
 
         repository.setDataSource(dataSource);
-//        repository.setDataSource(pgPoolingDataSource);
         
         JSONObject jsonList = repository.getJson(query);
         

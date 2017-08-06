@@ -10,7 +10,7 @@ import org.apache.commons.dbcp.BasicDataSource;
 import org.postgresql.ds.PGPoolingDataSource;
 import org.springframework.stereotype.Service;
 
-import net.bitnine.domain.dto.DataSourceDTO;
+import net.bitnine.domain.dto.DBConnectionInfo;
 import net.bitnine.exception.QueryException;
 import net.bitnine.util.JDBCTutorialUtilities;
 
@@ -18,7 +18,7 @@ import net.bitnine.util.JDBCTutorialUtilities;
 public class DatabaseService {
     
 
-    public void createPGPoolingDataSource (DataSourceDTO dataSourceDTO, String tokenString) throws NamingException, QueryException {
+    public void createPGPoolingDataSource (DBConnectionInfo dataSourceDTO, String tokenString) throws NamingException, QueryException {
 
 
         /*BasicDataSource dataSource = new BasicDataSource();
@@ -67,17 +67,28 @@ public class DatabaseService {
 //        new InitialContext().bind(tokenString, dataSource);
     }
 	
-	/*public DataSource createDataSource (DataSourceDTO dto) {
+	public DataSource createDataSource (DBConnectionInfo dbConnectionInfo) {
 		BasicDataSource dataSource = new BasicDataSource();
 		
 		dataSource.setDriverClassName("org.postgresql.Driver");
-		dataSource.setUrl(dto.getUrl());
-		dataSource.setUsername(dto.getUsername());
-		dataSource.setPassword(dto.getPassword());
+		dataSource.setUrl(dbConnectionInfo.getUrl());
+		dataSource.setUsername(dbConnectionInfo.getUsername());
+		dataSource.setPassword(dbConnectionInfo.getPassword());
 
         System.out.println("dataSource: " + dataSource);
 		return dataSource;
-	}*/
+	}
+
+	public void checkValidDataSource(DBConnectionInfo dbConnectionInfo) throws SQLException {
+		try {
+			createDataSource(dbConnectionInfo).getConnection();
+    	}
+    	catch (SQLException ex) {
+            JDBCTutorialUtilities.printSQLException(ex);
+            ex.printStackTrace();
+            throw new QueryException (JDBCTutorialUtilities.getSQLState(ex), ex);       // custom exception 사용.
+    	}			
+	}
 	
 	/*public void createDataSource(DataSourceDTO dto) throws NamingException {
 	    PGPoolingDataSource dataSource = new PGPoolingDataSource();

@@ -47,24 +47,15 @@ import net.bitnine.util.MetaDataUtils;
 public class JsonObjectRepository {
 
     @Autowired private PropertiesService propertiesService;
-
-    private PGPoolingDataSource dataSource;
-    public PGPoolingDataSource getDataSource() {
-        return dataSource;
-    }
-    public void setDataSource(PGPoolingDataSource dataSource) {
-        this.dataSource = dataSource;
-    }
     
-   /* private BasicDataSource dataSource;
+    private DataSource dataSource;	
 	
-	
-    public BasicDataSource getDataSource() {
+    public DataSource getDataSource() {
         return dataSource;
     }
-    public void setDataSource(BasicDataSource dataSource) {
+    public void setDataSource(DataSource dataSource) {
         this.dataSource = dataSource;
-    }*/
+    }
 
 
 	/**
