@@ -43,14 +43,11 @@ public class MetaDataUtils {
 	 */
     private static String getChangedType(String columnTypeName) {
         String changedType = "";
-        if ( columnTypeName.equals("int2") || columnTypeName.equals("int4") ) {
+        if ( columnTypeName.equals("int2") || columnTypeName.equals("int4") || columnTypeName.equals("int8") ) {
             changedType = "int";
         }
-        else if ( columnTypeName.equals("int8") ) {
-            changedType = "long";
-        }
         else if ( columnTypeName.equals("numeric") || columnTypeName.equals("float4")  || columnTypeName.equals("float8")  || columnTypeName.equals("serial")  || columnTypeName.equals("bigserial") ) {
-            changedType = "float";
+            changedType = "double";
         }
         else {
             changedType = columnTypeName;

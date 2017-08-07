@@ -16,10 +16,10 @@ import net.bitnine.jwt.ConnectionInfoMap;
 @RestController
 public class ConnectInfoController {
 
-    @Autowired private ConnectionInfoMap userInfoMap;
+    @Autowired private ConnectionInfoMap connectionInfoMap;
     
     @RequestMapping(value="/api/v1/db/connectInfo", method=RequestMethod.POST)
     public ConnectionInfoMap getConnectInfos() {        
-        return userInfoMap;
+        return connectionInfoMap;
     }
 }

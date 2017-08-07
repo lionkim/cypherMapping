@@ -12,13 +12,13 @@ import net.bitnine.jwt.ConnectInfo;
 @Scope("application")
 public class ConnectionInfoMap {
 
-	private Map<String, ConnectInfo> userInfos = new HashMap<>();
+	private Map<String, ConnectInfo> connectInfos = new HashMap<>();
 
-	public Map<String, ConnectInfo> getUserInfos() {
-		return userInfos;
+	public Map<String, ConnectInfo> getConnectInfos() {
+		return connectInfos;
 	}
 
-	public void setUserInfos(Map<String, ConnectInfo> userInfos) {
-		this.userInfos = userInfos;
+	public void setConnectInfos(Map<String, ConnectInfo> connectInfos) {
+		this.connectInfos = connectInfos;
 	}
 }

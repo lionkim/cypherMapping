@@ -36,7 +36,7 @@ public class DataSourceController {
 
     @Autowired private TokenAuthentication tokenAuthentication;
 
-	@Autowired private ConnectionInfoMap userInfoMap;    
+	@Autowired private ConnectionInfoMap connectionInfoMap;    
 	
 	/**
 	 *  사용자로부터 전달받은 dbconnect 정보를 가지고 token을 생성
@@ -49,21 +49,20 @@ public class DataSourceController {
 	 */
     @RequestMapping("/connect")
     public JSONObject connect(DBConnectionInfo dbConnectionInfo) throws NamingException, SQLException {
-
+        
     	JSONObject jsonObject = new JSONObject();     
     	
     	checkValidDataSource(dbConnectionInfo);		// 사용자로부터 전달받은 dbconnect 정보로 생성한 dataSource의 유효성을 체크 
 
-    	String id = generateId();		// 사용자 정보 아이디, token 아이디 생성
-
-        String tokenString = tokenAuthentication.generateToken(id, dbConnectionInfo);		// token 아이디와 사용자로부터 전달받은 dbconnect 정보로 token 생성.
-                
+        String userId = generateId();            // id 생성
+        String tokenString = tokenAuthentication.generateToken(userId, dbConnectionInfo);		// token 아이디와 사용자로부터 전달받은 dbconnect 정보로 token 생성.
+        
         jsonObject.put("token", tokenString);
         
         jsonObject.put("message", "Database Connect Success");
         
 
-        saveConnectionInfo(id, dbConnectionInfo);   // 사용자 db 접속정보를 application scope 객체 에 저장.
+        saveConnectionInfo(userId, dbConnectionInfo);   // 사용자 db 접속정보를 application scope 객체 에 저장.
         
         return jsonObject;
     }
@@ -85,13 +84,13 @@ public class DataSourceController {
         
         ConnectInfo connectInfo = new ConnectInfo();       // 새로운 ConnectInfo 객체를 생성.        
         
-        connectInfo.setToken (id);           
+//        connectInfo.setToken (id);           
         connectInfo.setConnetTime (stringCurrentTime());       // 현재 시간을 저장. 
         connectInfo.setQueryTimes(0);
         connectInfo.setState(State.VALID);
         connectInfo.setDbConnectionInfo(dbConnectionInfo);
         
-        userInfoMap.getUserInfos().put(id, connectInfo);      // connectInfos의 connectInfoList에 ConnectInfo 객체를 저장.        
+        connectionInfoMap.getConnectInfos().put(id, connectInfo);      // connectInfos의 connectInfoList에 ConnectInfo 객체를 저장.        
 	}
 	
 	// 현재 시간을 String형으로 반환.
@@ -102,10 +101,10 @@ public class DataSourceController {
     
 	// Connect 해제
     @RequestMapping("/disconnect")
-    public String disConnect(@RequestHeader(value="Authorization") String authorization)  {
-                
-        String key = tokenAuthentication.getIdInToken(authorization);       // 해당 토큰에서 key를 가져옴
-        ConnectInfo connectInfo = userInfoMap.getUserInfos().get(key);
+    public String disConnect(@RequestHeader(value="Authorization") String token)  {
+        String userId = tokenAuthentication.getClaimsByToken(token).getId();            // 해당 토큰안에 있는 id를 가져오는 메소드
+        
+        ConnectInfo connectInfo = connectionInfoMap.getConnectInfos().get(userId);
                 
         if (connectInfo == null) {
             return "Database DisConnect Failed";            

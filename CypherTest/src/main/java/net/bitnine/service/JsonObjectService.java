@@ -34,14 +34,11 @@ public class JsonObjectService {
 
     @Autowired private ConnectionInfoMap userInfoMap;
     
-    public JSONObject getJson (String query, String Authorization) throws UnsupportedEncodingException, InvalidTokenException, QueryException, NamingException {
-        
-        String userId = tokenAuthentication.getIdInToken(Authorization);            // 해당 토큰안에 있는 id를 가져오는 메소드
-        
-//        DBConnectionInfo dbConnectionInfo = userInfoMap.getUserInfos().get(userId);
-        
+    public JSONObject getJson (String query, String token) throws UnsupportedEncodingException, InvalidTokenException, QueryException, NamingException {
 
-        DBConnectionInfo dbConnectionInfo = userInfoMap.getUserInfos().get(userId).getDbConnectionInfo();
+        String userId = tokenAuthentication.getClaimsByToken(token).getId();            // 해당 토큰의 id를 가져옴      
+
+        DBConnectionInfo dbConnectionInfo = userInfoMap.getConnectInfos().get(userId).getDbConnectionInfo();
                 
         DataSource dataSource = databaseService.createDataSource(dbConnectionInfo);
         

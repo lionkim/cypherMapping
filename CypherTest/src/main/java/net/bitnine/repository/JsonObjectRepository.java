@@ -142,7 +142,7 @@ public class JsonObjectRepository {
 		String columnTypeName = resultSetMetaData.getColumnTypeName(cnt);     // 이 메소드를 호출하는 부분이 반복문임. 해당하는 count를 전달받아 columnTypeName 반환.
 		String columnName = resultSetMetaData.getColumnLabel(cnt);
 		
-		System.out.println("columnTypeName: " + columnTypeName);
+//		System.out.println("columnTypeName: " + columnTypeName);
 
 		switch (columnTypeName) {
 
@@ -163,32 +163,32 @@ public class JsonObjectRepository {
             break;
             
         case "decimal":
-            float decimalResult = pgResultSet.getFloat(columnName);
+            double decimalResult = pgResultSet.getDouble(columnName);
             rowJsonObject.put(columnName, decimalResult);
             break;
             
         case "numeric":
-            float numericResult = pgResultSet.getFloat(columnName);
+            double numericResult = pgResultSet.getDouble(columnName);
             rowJsonObject.put(columnName, numericResult);
             break;
             
         case "float4":
-            float float4Result = pgResultSet.getFloat(columnName);
+            double float4Result = pgResultSet.getDouble(columnName);
             rowJsonObject.put(columnName, float4Result);
             break;
             
         case "float8":
-            float float8Result = pgResultSet.getFloat(columnName);
+            double float8Result = pgResultSet.getDouble(columnName);
             rowJsonObject.put(columnName, float8Result);
             break;
             
         case "serial":
-            float serialResult = pgResultSet.getFloat(columnName);
+            double serialResult = pgResultSet.getDouble(columnName);
             rowJsonObject.put(columnName, serialResult);
             break;
             
         case "bigserial":
-            float bigserialResult = pgResultSet.getFloat(columnName);
+            double bigserialResult = pgResultSet.getDouble(columnName);
             rowJsonObject.put(columnName, bigserialResult);
             break;
             
