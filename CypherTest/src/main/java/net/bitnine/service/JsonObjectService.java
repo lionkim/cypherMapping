@@ -18,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import io.jsonwebtoken.Claims;
-import net.bitnine.domain.ConnectInfos;
 import net.bitnine.domain.dto.DBConnectionInfo;
 import net.bitnine.exception.InvalidTokenException;
 import net.bitnine.exception.QueryException;
@@ -38,18 +37,12 @@ public class JsonObjectService {
     
     public JSONObject getJson (String query, String Authorization) throws UnsupportedEncodingException, InvalidTokenException, QueryException, NamingException {
         
-        Claims claims = tokenAuthentication.getClaims(Authorization);       // 해당토큰을 가져옴. getClaims()에서 유효성 검사.
+        String userId = tokenAuthentication.getIdInToken(Authorization);            // 해당 토큰안에 있는 id를 가져오는 메소드
         
-        String userId = "";
+//        DBConnectionInfo dbConnectionInfo = userInfoMap.getUserInfos().get(userId);
         
-        if (claims != null) {
-        	userId = (String) claims.get("id");        
-        }
-        else {
-            throw new InvalidTokenException();
-        }
-        
-        DBConnectionInfo dbConnectionInfo = userInfoMap.getUserInfos().get(userId);
+
+        DBConnectionInfo dbConnectionInfo = userInfoMap.getUserInfos().get(userId).getDbConnectionInfo();
                 
         DataSource dataSource = databaseService.createDataSource(dbConnectionInfo);
         

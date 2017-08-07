@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import net.bitnine.domain.ConnectInfos;
+import net.bitnine.jwt.UserInfoMap;
 
 /**
  * 관리자가 사용자들의 접속 및 쿼리 정보를 조회하는 컨트롤러
@@ -16,10 +16,10 @@ import net.bitnine.domain.ConnectInfos;
 @RestController
 public class ConnectInfoController {
 
-    @Autowired private ConnectInfos connectInfos;
+    @Autowired private UserInfoMap userInfoMap;
     
     @RequestMapping(value="/api/v1/db/connectInfo", method=RequestMethod.POST)
-    public ConnectInfos getConnectInfos() {        
-        return connectInfos;
+    public UserInfoMap getConnectInfos() {        
+        return userInfoMap;
     }
 }

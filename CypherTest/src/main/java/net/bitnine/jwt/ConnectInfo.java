@@ -1,27 +1,32 @@
-package net.bitnine.domain;
+package net.bitnine.jwt;
 
 import java.time.LocalDateTime;
+
+import net.bitnine.domain.dto.DBConnectionInfo;
 
 public class ConnectInfo {
     
     private String token;
     
-//    private LocalDateTime connetTime;
     private String connetTime;
     
     private int queryTimes;
     
     private State state;
+    
+    private DBConnectionInfo dbConnectionInfo;
 
     public ConnectInfo() {
     }
 
-    public ConnectInfo(String token, String connetTime, int queryTimes, State state) {
+    public ConnectInfo(String token, String connetTime, int queryTimes, State state, DBConnectionInfo dbConnectionInfo) {
         this.token = token;
         this.connetTime = connetTime;
         this.queryTimes = queryTimes;
         this.state = state;
+        this.dbConnectionInfo = dbConnectionInfo;
     }
+    
 
     public String getToken() {
         return token;
@@ -55,5 +60,12 @@ public class ConnectInfo {
         this.state = state;
     }
     
-    
+
+    public DBConnectionInfo getDbConnectionInfo() {
+        return dbConnectionInfo;
+    }
+
+    public void setDbConnectionInfo(DBConnectionInfo dbConnectionInfo) {
+        this.dbConnectionInfo = dbConnectionInfo;
+    }
 }

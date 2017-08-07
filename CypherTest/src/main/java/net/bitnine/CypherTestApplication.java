@@ -27,7 +27,7 @@ public class CypherTestApplication {
 	}
 
 
-    @Bean
+    /*@Bean
     public TomcatEmbeddedServletContainerFactory tomcatFactory() {
         return new TomcatEmbeddedServletContainerFactory() {
 
@@ -59,5 +59,5 @@ public class CypherTestApplication {
         bean.setLookupOnStartup(false);
         bean.afterPropertiesSet();
         return (DataSource)bean.getObject();
-    }
+    }*/
 }

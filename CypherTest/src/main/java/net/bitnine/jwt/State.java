@@ -1,4 +1,4 @@
-package net.bitnine.domain;
+package net.bitnine.jwt;
 
 public enum State {
 

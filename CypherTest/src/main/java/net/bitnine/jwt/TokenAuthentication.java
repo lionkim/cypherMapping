@@ -4,11 +4,10 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.impl.crypto.MacProvider;
-import net.bitnine.domain.ConnectInfo;
-import net.bitnine.domain.ConnectInfos;
-import net.bitnine.domain.State;
+import net.bitnine.jwt.ConnectInfo;
 import net.bitnine.domain.dto.DBConnectionInfo;
 import net.bitnine.exception.InValidDataSourceException;
+import net.bitnine.exception.InvalidTokenException;
 import net.bitnine.exception.QueryException;
 import net.bitnine.service.DatabaseService;
 import net.bitnine.service.PropertiesService;
@@ -46,7 +45,7 @@ public class TokenAuthentication {
     
 	@Autowired private DatabaseService databaseService;
 	
-	@Autowired private ConnectInfos connectInfos;    
+	@Autowired private UserInfoMap userInfoMap;    
         
     private final Key secret = MacProvider.generateKey(SignatureAlgorithm.HS256);			// 비밀키생성
     private final byte[] secretBytes = secret.getEncoded();
@@ -79,27 +78,19 @@ public class TokenAuthentication {
 		return token;
     }
 
-	/**
-     * Authorization에 해당하는 Claims을 리턴.
-     * @param Authorization
+    /**
+     * token에 해당하는 Claims을 리턴.
+     * @param token
      * @return
      */
-    public Claims getClaims (String Authorization) {
+    public Claims getClaimsInToken (String token) {
 
         Claims claims = null;
-        ConnectInfo connectInfo;
         
         try {
-            connectInfo = verifyToken(Authorization); 
-            
-            if (connectInfo == null) {
-                return claims;          
-            }
-            else {
-                claims = Jwts.parser()
-                        .setSigningKey(base64SecretByptes)
-                        .parseClaimsJws(Authorization).getBody();
-            }
+            claims = Jwts.parser()
+                    .setSigningKey(base64SecretByptes)
+                    .parseClaimsJws(token).getBody();
         }
         catch (Exception e) {
             return claims;          
@@ -107,24 +98,69 @@ public class TokenAuthentication {
         return claims;
     }
 
+    // 해당 토큰안에 있는 id를 가져오는 메소드
+    public String getIdInToken(String token) {
+        Claims claims = getClaimsInToken(token);       // 해당토큰을 가져옴.
+        
+        String userId = "";
+        
+        if (claims != null) {
+            userId = (String) claims.get("id");        
+        }
+        else {
+            throw new InvalidTokenException();
+        }
+        
+        if (verifyToken(userId) == null) {
+            throw new InvalidTokenException();
+        }
+        
+        return userId;
+    }
     /**
-     * connectInfos의 connectInfoList에서 Authorization에 해당하는 ConnectInfo를 찾아서 상태를 확인하여 
+     * UserInfoMap의 UserInfos에서 key에 해당하는 ConnectInfo를 찾아서 상태를 확인하여 
      * 상태가 VALID일 경우 해당하는 ConnectInfo를 반환.
      * 상태가 INVALID 이거나  해당하는 ConnectInfo가 없으면 null을 반환
      */
-    private ConnectInfo verifyToken(String Authorization) {
+    private String verifyToken(String key) {
         ConnectInfo connectInfo;
-        connectInfo = connectInfos.getConnectInfoList().stream()                        // Convert to steam
-                .filter(x -> Authorization.equals(x.getToken()))        // we want Authorization only
-                .findAny()                                      // If 'findAny' then return found
-                .orElse(null);
+        
+        connectInfo = userInfoMap.getUserInfos().get(key);
         
         if ( (connectInfo == null) || ((connectInfo != null) && (connectInfo.getState() == State.INVALID)) ) {
             return null;
         }
-        return connectInfo;
+        return "success";
     }
     
+
+    /**
+     * token에 해당하는 Claims을 리턴.
+     * @param token
+     * @return
+     */
+    /*public Claims getClaims (String token) {
+
+        Claims claims = null;
+        ConnectInfo connectInfo;
+        
+        try {
+            connectInfo = verifyToken(token); 
+            
+            if (connectInfo == null) {
+                return claims;          
+            }
+            else {
+                claims = Jwts.parser()
+                        .setSigningKey(base64SecretByptes)
+                        .parseClaimsJws(token).getBody();
+            }
+        }
+        catch (Exception e) {
+            return claims;          
+        }
+        return claims;
+    }*/
 
 	/*static void addAuthentication(HttpServletResponse res, String username) {
 		String JWT = Jwts.builder().setSubject(username)

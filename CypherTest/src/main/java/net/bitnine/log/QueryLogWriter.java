@@ -6,10 +6,12 @@ import java.time.format.DateTimeFormatter;
 import javax.servlet.http.HttpServletRequest;
 
 import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
+import org.aspectj.lang.reflect.MethodSignature;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -20,9 +22,11 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import net.bitnine.domain.ConnectInfo;
-import net.bitnine.domain.ConnectInfos;
-import net.bitnine.domain.State;
+import net.bitnine.domain.dto.DBConnectionInfo;
+import net.bitnine.jwt.ConnectInfo;
+import net.bitnine.jwt.State;
+import net.bitnine.jwt.TokenAuthentication;
+import net.bitnine.jwt.UserInfoMap;
 
 /**
  * 사용자의 접속정보, 쿼리 횟수의 로그 생성 클래스.
@@ -34,7 +38,8 @@ import net.bitnine.domain.State;
 @Component
 public class QueryLogWriter {
 
-    @Autowired private ConnectInfos connectInfos;
+    @Autowired private UserInfoMap userInfoMap;
+    @Autowired private TokenAuthentication tokenAuthentication;
     
     private static final String CONNECT_SUCCESS = "Database Connect Success";
     
@@ -50,6 +55,10 @@ public class QueryLogWriter {
     @Pointcut("execution(* net.bitnine.controller.JsonObjectController.getJson(..))") 
     public void queryLog() { }
 	
+    
+    
+    
+
 	
 	/**
 	 * DB Connect 로그를 남기는 어드바이스.
@@ -58,31 +67,36 @@ public class QueryLogWriter {
 	 * @return
 	 * @throws Throwable
 	 */
+    
 	@Around("connectInfo()")
 	public Object connectAdvice (ProceedingJoinPoint JoinPoint) throws Throwable {	
 		Object ret = JoinPoint.proceed();      // 프록시 대상 객체의 실제 메소드를 호출.
 
+		DBConnectionInfo dbConnectionInfo = (DBConnectionInfo) JoinPoint.getArgs()[0];     // 대상 메소드의 1번째 인자. DBConnectionInfo
+	    
 	    ConnectInfo connectInfo = new ConnectInfo();       // 새로운 ConnectInfo 객체를 생성.
 		
 		JSONObject jsonObject = (JSONObject) ret;
+		String token = (String) jsonObject.get("token");
+		
+		String key = tokenAuthentication.getIdInToken(token);     // 해당 token안에 저장된 id를 가져옴
+		
 		if (jsonObject.get("message") == CONNECT_SUCCESS) {  // Db Connect가 성공했을 때 실행
-		    connectInfo.setToken ((String) jsonObject.get("token"));	        
-	        connectInfo.setConnetTime (stringCurrentTime());       // 현재 시간을 저장. 
+		    connectInfo.setToken (token);	        
+//	        connectInfo.setConnetTime (stringCurrentTime());       // 현재 시간을 저장. 
 	        connectInfo.setQueryTimes(0);
-	        connectInfo.setState(State.VALID);
+            connectInfo.setState(State.VALID);
+            connectInfo.setDbConnectionInfo(dbConnectionInfo);
 		}
         
-        connectInfos.getConnectInfoList().add (connectInfo);     // connectInfos의 connectInfoList에 ConnectInfo 객체를 저장.
+		userInfoMap.getUserInfos().put(key, connectInfo);      // connectInfos의 connectInfoList에 ConnectInfo 객체를 저장.
+//        userInfoMap.getConnectInfoList().add (connectInfo);     // connectInfos의 connectInfoList에 ConnectInfo 객체를 저장.
         
         System.out.println("Around connectInfo 생성!");
 		return ret;
 	}
 
-	// 현재 시간을 String형으로 반환.
-    private String stringCurrentTime() {
-        String timeFormat = "yyyy-MM-dd HH:mm:ss";        
-        return LocalDateTime.now().format(DateTimeFormatter.ofPattern(timeFormat));
-    }
+	
 
     /**
      * 사용자가 쿼리를 실행한 후 로그를 생성하는 어드바이스.
@@ -98,13 +112,8 @@ public class QueryLogWriter {
         
         Object ret = JoinPoint.proceed();      // 프록시 대상 객체의 실제 메소드를 호출.  
 
-//        ConnectInfo connectInfo =  getConnectInfoByToken(Authorization);
-        setConnectInfoByToken(Authorization);
-        
-       /* int times = connectInfo.getQueryTimes();
-        connectInfo.setQueryTimes(++times);
-        
-        connectInfos.getConnectInfoList().add(connectInfo);*/
+        String key = tokenAuthentication.getIdInToken(Authorization);       // 해당 토큰에서 key를 가져옴
+        setConnectInfoByToken(key);
         
         System.out.println("Around queryLog 생성!");
         
@@ -118,12 +127,9 @@ public class QueryLogWriter {
      * @param Authorization
      * @return
      */
-    private void setConnectInfoByToken(String Authorization) {
+    private void setConnectInfoByToken(String key) {
         
-        ConnectInfo connectInfo = connectInfos.getConnectInfoList().stream()                        // Convert to steam
-                .filter(x -> Authorization.equals(x.getToken()))        // we want Authorization only
-                .findAny()                                      // If 'findAny' then return found
-                .orElse(null); 
+        ConnectInfo connectInfo = userInfoMap.getUserInfos().get(key);
 
         int times = connectInfo.getQueryTimes();
         connectInfo.setQueryTimes(++times);
