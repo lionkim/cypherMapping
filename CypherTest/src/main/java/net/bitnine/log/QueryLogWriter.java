@@ -26,7 +26,7 @@ import net.bitnine.domain.dto.DBConnectionInfo;
 import net.bitnine.jwt.ConnectInfo;
 import net.bitnine.jwt.State;
 import net.bitnine.jwt.TokenAuthentication;
-import net.bitnine.jwt.UserInfoMap;
+import net.bitnine.jwt.ConnectionInfoMap;
 
 /**
  * 사용자의 접속정보, 쿼리 횟수의 로그 생성 클래스.
@@ -38,7 +38,7 @@ import net.bitnine.jwt.UserInfoMap;
 @Component
 public class QueryLogWriter {
 
-    @Autowired private UserInfoMap userInfoMap;
+    @Autowired private ConnectionInfoMap userInfoMap;
     @Autowired private TokenAuthentication tokenAuthentication;
     
     private static final String CONNECT_SUCCESS = "Database Connect Success";

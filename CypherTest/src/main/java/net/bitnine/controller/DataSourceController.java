@@ -17,7 +17,7 @@ import net.bitnine.domain.dto.DBConnectionInfo;
 import net.bitnine.jwt.ConnectInfo;
 import net.bitnine.jwt.State;
 import net.bitnine.jwt.TokenAuthentication;
-import net.bitnine.jwt.UserInfoMap;
+import net.bitnine.jwt.ConnectionInfoMap;
 import net.bitnine.service.DatabaseService;
 
 /**
@@ -36,7 +36,7 @@ public class DataSourceController {
 
     @Autowired private TokenAuthentication tokenAuthentication;
 
-	@Autowired private UserInfoMap userInfoMap;    
+	@Autowired private ConnectionInfoMap userInfoMap;    
 	
 	/**
 	 *  사용자로부터 전달받은 dbconnect 정보를 가지고 token을 생성

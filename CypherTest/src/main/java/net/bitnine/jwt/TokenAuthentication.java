@@ -45,7 +45,7 @@ public class TokenAuthentication {
     
 	@Autowired private DatabaseService databaseService;
 	
-	@Autowired private UserInfoMap userInfoMap;    
+	@Autowired private ConnectionInfoMap userInfoMap;    
         
     private final Key secret = MacProvider.generateKey(SignatureAlgorithm.HS256);			// 비밀키생성
     private final byte[] secretBytes = secret.getEncoded();

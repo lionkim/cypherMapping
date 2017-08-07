@@ -10,7 +10,7 @@ import net.bitnine.jwt.ConnectInfo;
 
 @Component
 @Scope("application")
-public class UserInfoMap {
+public class ConnectionInfoMap {
 
 	private Map<String, ConnectInfo> userInfos = new HashMap<>();
 

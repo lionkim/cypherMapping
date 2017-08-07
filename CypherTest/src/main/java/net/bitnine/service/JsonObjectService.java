@@ -21,9 +21,8 @@ import io.jsonwebtoken.Claims;
 import net.bitnine.domain.dto.DBConnectionInfo;
 import net.bitnine.exception.InvalidTokenException;
 import net.bitnine.exception.QueryException;
-import net.bitnine.jwt.DataSourceMap;
 import net.bitnine.jwt.TokenAuthentication;
-import net.bitnine.jwt.UserInfoMap;
+import net.bitnine.jwt.ConnectionInfoMap;
 //import net.bitnine.jwt.TokenAuthentication;
 import net.bitnine.repository.JsonObjectRepository;
 
@@ -33,7 +32,7 @@ public class JsonObjectService {
     @Autowired private TokenAuthentication tokenAuthentication;
     @Autowired private JsonObjectRepository repository;
 
-    @Autowired private UserInfoMap userInfoMap;
+    @Autowired private ConnectionInfoMap userInfoMap;
     
     public JSONObject getJson (String query, String Authorization) throws UnsupportedEncodingException, InvalidTokenException, QueryException, NamingException {
         
