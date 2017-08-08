@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -22,15 +23,21 @@ import net.bitnine.service.JsonObjectService;
  * @Date	  : 2017. 7. 25.
  *
  */
-@RestController
+@Controller
+@RequestMapping(value="/api/v1/db/")
 public class JsonObjectController {
 
 	@Autowired private JsonObjectService service;
 
-	@RequestMapping(value="/api/v1/db/query", method=RequestMethod.POST)
-	public JSONObject getJson(String query, @RequestHeader(value="Authorization") String Authorization) throws  IOException, InvalidTokenException, QueryException, NamingException {
+	@RequestMapping(value="/query", method=RequestMethod.GET)
+	public String queryGet() throws  IOException, InvalidTokenException, QueryException, NamingException {
 	    
-		return service.getJson(query, Authorization);
+		return "query";
 	}
 	
+	@RequestMapping(value="/query", method=RequestMethod.POST)
+    public JSONObject queryPost(String query, @RequestHeader(value="Authorization") String Authorization) throws  IOException, InvalidTokenException, QueryException, NamingException {
+        
+        return service.getJson(query, Authorization);
+    }
 }

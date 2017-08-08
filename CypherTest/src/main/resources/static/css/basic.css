@@ -1,0 +1,15 @@
+@charset "UTF-8";
+
+.login {
+	margin: 5px;
+	padding: 5px;
+	width: 600px;
+}
+.url {
+	width: 350px;
+}
+
+label  {
+	width: 120px;
+  display: inline-block;
+}

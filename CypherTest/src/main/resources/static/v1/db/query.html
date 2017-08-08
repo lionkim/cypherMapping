@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+	<script src="/script/jquery-3.2.1.min.js"></script>
+	<script>
+	$(function() {
+
+		/* var msg = [[${msg}]];
+		var json = [[${json}]]; */
+		
+		var msg = '${msg}';
+
+		alert("msg: " + msg);
+		
+		
+		if(msg =='success') {
+			alert("정상적으로 처리되었습니다.");
+			var stateObj = { msg: "" };
+			
+			$("#result").html(json);
+		}
+	});
+	
+	</script>
+</head>
+<body>
+	<div id="result"></div>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

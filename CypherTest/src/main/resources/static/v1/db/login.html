@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>LogIn</title>
+	<link rel="stylesheet" type="text/css" href="/css/basic.css" />
+	<script src="/script/jquery-3.2.1.min.js"></script>
+	<script>
+	$(function() {
+	});
+	
+	</script>
+</head>
+<body>
+	<div class="login">
+		<form name = "loginForm" action="/api/v1/db/connect">
+			<p><label for="url">URL: </label><input type="text" id="url" class="url" name="url" /></p>
+			<p><label for="username">USERNAME: </label><input type="text" id="username" name="username" /></p>
+			<p><label for="password">PASSWORD: </label><input type="password" id="password" name="password" /></p>
+			<p><input type="submit" value="submit" /></p>
+		</form>	
+	</div>
+</body>
+</html>
