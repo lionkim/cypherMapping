@@ -1,0 +1,13 @@
+insert into `POST` (`SUBJECT`, `CONTENT`) values ('subject1', 'contents1');
+insert into `POST` (`SUBJECT`, `CONTENT`) values ('subject2', 'contents2');
+insert into `POST` (`SUBJECT`, `CONTENT`) values ('subject3', 'contents3');
+insert into `POST` (`SUBJECT`, `CONTENT`) values ('subject4', 'contents4');
+insert into `POST` (`SUBJECT`, `CONTENT`) values ('subject5', 'contents5');
+
+
+insert into `USER_ROLE` (`ROLE_ID`, `ROLE`) values (21, 'ADMIN');
+insert into `USER_ROLE` (`ROLE_ID`, `ROLE`) values (22, 'USER');
+
+
+insert into `USER` (`ID`, `PASSWORD`, `ROLE_ID`) values ('agraph', 'agraph', 21);
+insert into `USER` (`ID`, `PASSWORD`, `ROLE_ID`) values ('test01', 'test01', 22);

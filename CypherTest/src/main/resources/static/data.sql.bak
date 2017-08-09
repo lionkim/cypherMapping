@@ -1,0 +1,5 @@
+insert into POST (SUBJECT, CONTENT, REG_DATE) values ("subject1", "contents1", CURRENT_DATE() );
+insert into POST (SUBJECT, CONTENT, REG_DATE) values ("subject2", "contents2", CURRENT_DATE() );
+insert into POST (SUBJECT, CONTENT, REG_DATE) values ("subject3", "contents3", CURRENT_DATE() );
+insert into POST (SUBJECT, CONTENT, REG_DATE) values ("subject4", "contents4", CURRENT_DATE() );
+insert into POST (SUBJECT, CONTENT, REG_DATE) values ("subject5", "contents5", CURRENT_DATE() );
