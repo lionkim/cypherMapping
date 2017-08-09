@@ -10,6 +10,7 @@ import javax.naming.NamingException;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,7 +29,7 @@ import net.bitnine.service.DatabaseService;
  * @author cppco
  *
  */
-@Controller
+@RestController
 @RequestMapping("/api/v1/db/")
 public class DataSourceController {
 
@@ -52,14 +53,14 @@ public class DataSourceController {
 	 * @throws SQLException
 	 */
     @RequestMapping("/connect")
-    public String connect(DBConnectionInfo dbConnectionInfo, RedirectAttributes rttr) throws NamingException, SQLException {
+    public JSONObject connect(@RequestBody DBConnectionInfo dbConnectionInfo, RedirectAttributes rttr) throws NamingException, SQLException {
         
     	JSONObject jsonObject = new JSONObject();     
     	
     	checkValidDataSource(dbConnectionInfo);		// 사용자로부터 전달받은 dbconnect 정보로 생성한 dataSource의 유효성을 체크 
 
         String userId = generateId();            // id 생성
-        String tokenString = tokenAuthentication.generateToken(userId, dbConnectionInfo);		// token 아이디와 사용자로부터 전달받은 dbconnect 정보로 token 생성.
+        String tokenString = tokenAuthentication.generateToken(userId);		// token 아이디와 사용자로부터 전달받은 dbconnect 정보로 token 생성.
         
         jsonObject.put("token", tokenString);
         
@@ -67,8 +68,10 @@ public class DataSourceController {
         
 
         saveConnectionInfo(userId, dbConnectionInfo);   // 사용자 db 접속정보를 application scope 객체 에 저장.
-
-        rttr.addFlashAttribute("json", jsonObject);
+        
+        return jsonObject;
+        
+        /*rttr.addFlashAttribute("json", jsonObject);
         rttr.addFlashAttribute("msg", "success");
         
         if ( ADMIN.equals(dbConnectionInfo.getUsername()) ) {
@@ -82,7 +85,7 @@ public class DataSourceController {
         else {
 
             return "redirect:login";
-        }
+        }*/
         
     }
 

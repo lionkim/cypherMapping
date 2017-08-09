@@ -8,11 +8,16 @@ import javax.servlet.http.HttpServletRequest;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import net.bitnine.domain.dto.DBConnectionInfo;
+import net.bitnine.domain.dto.QueryInfo;
 import net.bitnine.exception.InvalidTokenException;
 import net.bitnine.exception.QueryException;
 import net.bitnine.service.JsonObjectService;
@@ -36,8 +41,37 @@ public class JsonObjectController {
 	}
 	
 	@RequestMapping(value="/query", method=RequestMethod.POST)
-    public JSONObject queryPost(String query, @RequestHeader(value="Authorization") String Authorization) throws  IOException, InvalidTokenException, QueryException, NamingException {
-        
-        return service.getJson(query, Authorization);
+    public @ResponseBody JSONObject queryPost(@RequestHeader(value="Authorization") String Authorization, @RequestBody QueryInfo query) 
+            throws  IOException, InvalidTokenException, QueryException, NamingException {
+	    
+	    System.out.println("query: " + query.getQuery());
+        System.out.println("Authorization: " + Authorization);
+	    
+        return service.getJson(query.getQuery(), Authorization);
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -32,13 +32,12 @@ public class TokenAuthentication {
     private final String base64SecretBytes = Base64.getEncoder().encodeToString(secretBytes);    	// 비밀키로 base64 인코딩
     
     /**
-     * 토큰생성, 사용 dbConnection정보확인 및 저장
+     * 토큰생성
      * @param id 
-     * @param dbConnectionInfo
      * @return
      * @throws SQLException 
      */
-    public String generateToken(String id, DBConnectionInfo dbConnectionInfo) throws SQLException {    
+    public String generateToken(String id) throws SQLException {    
 		Date now = new Date();
         int temp = (1000 * 60 * 60 * 24);		// 1000 millisecond.  1초 * 60 * 60 * 24 = 1일
         
