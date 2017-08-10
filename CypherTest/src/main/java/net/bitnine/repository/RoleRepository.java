@@ -2,8 +2,8 @@ package net.bitnine.repository;
 
 import org.springframework.data.repository.CrudRepository;
 
-import net.bitnine.jwt.security.UserRole;
+import net.bitnine.jwt.security.MemberRole;
 
-public interface RoleRepository extends CrudRepository<UserRole, Integer>{
+public interface RoleRepository extends CrudRepository<MemberRole, Integer>{
 
 }

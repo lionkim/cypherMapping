@@ -14,7 +14,7 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "USER_ROLE")
-public class UserRole {
+public class MemberRole {
 
     @Id
 	private int roleId;

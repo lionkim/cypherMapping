@@ -1,10 +1,15 @@
 package net.bitnine.jwt.security;
 
+import java.util.List;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -12,7 +17,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-public class User {
+public class Member {
 
     @Id
 	private String id;
@@ -20,9 +25,13 @@ public class User {
     @Column
 	private String password;
 
-    @ManyToOne
+    @OneToMany(cascade=CascadeType.ALL, fetch=FetchType.EAGER)
+    @JoinColumn(name = "member")
+    private List<MemberRole> roles;
+    
+    /*@ManyToOne
     @JoinColumn(name = "role_id")
-	private UserRole UserRole;
+	private MemberRole UserRole;*/
     
     /*@OneToMany(cascade=CascadeType.ALL, fetch=FetchType.EAGER)
     @JoinColumn(name = "role_id")

@@ -16,7 +16,7 @@ import lombok.extern.java.Log;
 @Log
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     
-    @Autowired AuthenticationUserService authenticationUserService;
+    @Autowired SecurityUserService authenticationUserService;
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {

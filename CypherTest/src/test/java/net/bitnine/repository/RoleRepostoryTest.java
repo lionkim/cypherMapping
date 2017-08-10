@@ -14,8 +14,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import lombok.extern.java.Log;
 import net.bitnine.jwt.security.Role;
-import net.bitnine.jwt.security.User;
-import net.bitnine.jwt.security.UserRole;
+import net.bitnine.jwt.security.Member;
+import net.bitnine.jwt.security.MemberRole;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -29,8 +29,8 @@ public class RoleRepostoryTest {
 
 	@Test
 	public void testRead() {
-		UserRole userRole01 = repository.findOne(userRoleId01);
-		UserRole userRole02 = repository.findOne(userRoleId02);
+		MemberRole userRole01 = repository.findOne(userRoleId01);
+		MemberRole userRole02 = repository.findOne(userRoleId02);
 		
 		assertThat(userRole01.getRoleId(), is(userRoleId01));
 		assertThat(userRole02.getRoleId(), is(userRoleId02));
