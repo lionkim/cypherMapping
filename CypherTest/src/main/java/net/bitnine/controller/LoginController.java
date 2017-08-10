@@ -8,6 +8,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @RequestMapping(value="/api/v1/db/")
 public class LoginController {
 
+    // test login
+    @RequestMapping(value="/testLogin", method=RequestMethod.GET)
+    public String testLogin() {
+        return "testLogin";
+    }
+
     @RequestMapping(value="/login", method=RequestMethod.GET)
     public String loginGet() {
         return "login";
@@ -16,5 +22,10 @@ public class LoginController {
     @RequestMapping(value="/login", method=RequestMethod.POST)
     public String loginPost() {
         return "login";
+    }
+    
+    @RequestMapping(value="/accessDenied")
+    public void accessDenied() {
+        
     }
 }
