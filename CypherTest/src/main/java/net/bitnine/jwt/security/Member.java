@@ -25,9 +25,8 @@ public class Member {
     @Column
 	private String password;
 
-    @OneToMany(cascade=CascadeType.ALL, fetch=FetchType.EAGER)
-    @JoinColumn(name = "member")
-    private List<MemberRole> roles;
+    @ManyToOne(cascade=CascadeType.ALL, fetch=FetchType.EAGER)
+    private MemberRole roles;
     
     /*@ManyToOne
     @JoinColumn(name = "role_id")

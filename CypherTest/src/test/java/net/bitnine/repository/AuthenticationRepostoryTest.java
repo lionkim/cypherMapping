@@ -37,17 +37,17 @@ public class AuthenticationRepostoryTest {
 		assertThat(user01.getPassword(), is(userPW01));
 		assertThat(user02.getPassword(), is(userPW02));
 		
-		/*assertThat(user01.getRoles().getRoleId(), is(21));
+		assertThat(user01.getRoles().getRoleId(), is(21));
 		assertThat(user02.getRoles().getRoleId(), is(22));
 
 		assertThat(user01.getRoles().getRole(), is(Role.ADMIN));
-		assertThat(user02.getRoles().getRole(), is(Role.USER));*/
+		assertThat(user02.getRoles().getRole(), is(Role.USER));
 		
-		assertThat(user01.getRoles().get(0), is(21));
+		/*assertThat(user01.getRoles().get(0), is(21));
 		assertThat(user02.getRoles().get(1), is(22));
 
 		assertThat(user01.getRoles().get(0).getRole(), is(Role.ADMIN));
-		assertThat(user02.getRoles().get(1).getRole(), is(Role.USER));
+		assertThat(user02.getRoles().get(1).getRole(), is(Role.USER));*/
 	}
 }
 

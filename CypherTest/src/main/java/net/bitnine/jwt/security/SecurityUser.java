@@ -23,13 +23,16 @@ public class SecurityUser extends User {
         
         super(member.getId(), member.getPassword(), makeGrantedAuthority(member.getRoles()));
     }
+
+//  private static Collection<? extends GrantedAuthority> makeGrantedAuthority(List<MemberRole> roles) {
+  private static Collection<? extends GrantedAuthority> makeGrantedAuthority(MemberRole role) {
     
-    private static Collection<? extends GrantedAuthority> makeGrantedAuthority(List<MemberRole> roles) {
         List<GrantedAuthority> grantedAuthorityList = new ArrayList<>();
         
-        roles.forEach(
+        /*roles.forEach(
                 role -> grantedAuthorityList.add(
-                        new SimpleGrantedAuthority(ROLE_PREFIX + role.getRole())) );
+                        new SimpleGrantedAuthority(ROLE_PREFIX + role.getRole())) );*/
+        grantedAuthorityList.add(new SimpleGrantedAuthority(ROLE_PREFIX + role.getRole()) );
         
         return grantedAuthorityList;
     }

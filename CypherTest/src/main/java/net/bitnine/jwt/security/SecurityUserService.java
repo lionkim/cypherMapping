@@ -17,9 +17,9 @@ public class SecurityUserService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         
-        repository.findOne(username)
+        /*repository.findOne(username)
             .filter(m -> m != null)
-            .map(m -> new SecurityUser(m)).get();
+            .map(m -> new SecurityUser(m)).get();*/
         
         return null;
     }

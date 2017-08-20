@@ -20,7 +20,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		log.info("security config......................");
+//		log.info("security config......................");
 		
         http.authorizeRequests().antMatchers("/h2console").permitAll();
 		
